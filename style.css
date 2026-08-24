@@ -19,3 +19,5 @@ tr.income{background:#e9f7ed}tr.expense{background:#fff0f0}tr.transfer{backgroun
 .amount{font-weight:700;text-align:right}.muted,.note{font-size:12px;color:#6c7680}.note{padding:8px 2px}
 @media(max-width:800px){.summary{grid-template-columns:repeat(2,1fr)}form{grid-template-columns:1fr 1fr}.cards{grid-template-columns:repeat(2,1fr)}.month-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:520px){header{padding:14px}.summary{grid-template-columns:1fr 1fr}.card strong{font-size:17px}.panel{padding:12px}form{grid-template-columns:1fr 1fr}form input:nth-child(2){grid-column:1/-1}.cards{grid-template-columns:1fr 1fr}th,td{padding:8px;font-size:12px}}
+
+.actions{display:flex;gap:8px;align-items:center}.danger-outline{border-color:#e5a3a3;color:#a51d1d;background:#fff}

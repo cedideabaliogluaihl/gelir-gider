@@ -18,3 +18,7 @@ Kasa transferi gider değildir; para sadece kasaya taşınır.
 
 ## Not
 İlk sürüm verileri tarayıcının localStorage alanında tutar. Telefon ve bilgisayar arasında ortak veri için sonraki aşamada Supabase gibi bir bulut veritabanı eklenebilir.
+
+
+## Temiz sürüm
+Bu sürüm örnek/test para kayıtları içermez. İlk açılış boştur. `Tüm Verileri Temizle` ile cihazdaki kayıtlar sıfırlanabilir.

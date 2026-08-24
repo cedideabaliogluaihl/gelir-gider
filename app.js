@@ -6,7 +6,17 @@ const today=new Date();
 $("date").value=today.toISOString().slice(0,10);
 $("card").disabled=false;
 
-function save(){localStorage.setItem(KEY,JSON.stringify(items)); render();}
+function save(){localStorage.setItem(KEY,JSON.stringify(items)); 
+$("clearAllBtn").addEventListener("click",()=>{
+  if(!items.length)return alert("Silinecek kayıt yok.");
+  if(confirm("TÜM gelir, gider, kasa ve kart kayıtları silinecek. Devam edilsin mi?")){
+    items=[];
+    localStorage.removeItem(KEY);
+    render();
+  }
+});
+
+render();}
 function totals(rows){
   return {
     income:rows.filter(x=>x.type==="Gelir").reduce((s,x)=>s+x.amount,0),
