@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1f4e78">
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
@@ -26,22 +26,20 @@
   </section>
 
   <section class="panel">
-    <div class="panel-head">
-      <h2>Yeni İşlem</h2>
-    </div>
+    <h2>Yeni İşlem</h2>
     <form id="form">
       <input id="date" type="date" required>
       <input id="description" type="text" placeholder="Açıklama" required>
       <select id="type">
-        <option>Gider</option>
-        <option>Gelir</option>
-        <option>Kasa Transferi</option>
+        <option value="Gider">Gider</option>
+        <option value="Gelir">Gelir</option>
+        <option value="Kasa Transferi">Kasa Transferi</option>
       </select>
       <select id="card">
         <option value="">Kart yok</option>
-        <option>Kart 1</option>
-        <option>Kart 2</option>
-        <option>Kart 3</option>
+        <option value="Kart 1">Kart 1</option>
+        <option value="Kart 2">Kart 2</option>
+        <option value="Kart 3">Kart 3</option>
       </select>
       <input id="amount" type="number" step="0.01" min="0.01" placeholder="Tutar" required>
       <button class="primary" type="submit">+ EKLE</button>
@@ -64,7 +62,7 @@
   <section class="panel">
     <div class="panel-head">
       <h2>Aylık Özet</h2>
-      <select id="monthFilter"></select>
+      <select id="monthFilter"><option value="all">Tüm Aylar</option></select>
     </div>
     <div class="month-grid">
       <div><span>Gelir</span><strong id="monthIncome">0 ₺</strong></div>
@@ -77,17 +75,23 @@
   <section class="panel">
     <div class="panel-head">
       <h2>İşlemler</h2>
-      <div class="actions"><button id="clearBtn" class="danger-outline">Seçiliyi Sil</button><button id="clearAllBtn" class="danger-outline">Tüm Verileri Temizle</button></div>
+      <div class="actions">
+        <button id="clearBtn" class="danger-outline">Seçiliyi Sil</button>
+        <button id="clearAllBtn" class="danger-outline">Tüm Verileri Temizle</button>
+      </div>
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th></th><th>Tarih</th><th>Açıklama</th><th>Tür</th><th>Kart</th><th>Tutar</th></tr></thead>
+        <thead>
+          <tr><th></th><th>Tarih</th><th>Açıklama</th><th>Tür</th><th>Kart</th><th>Tutar</th></tr>
+        </thead>
         <tbody id="list"></tbody>
       </table>
+      <div id="empty" class="empty">Henüz işlem yok.</div>
     </div>
   </section>
 
-  <p class="note">Kullanılabilir Para = Gelir − Gider − Kasaya Aktarılan. Kasaya aktarılan para gider değildir; para sadece kasaya taşınır. Toplam Varlık = Kullanılabilir Para + Kasa.</p>
+  <p class="note">Veriler bu cihazın tarayıcısında saklanır. Net = Gelir − Gider − Kasaya Aktarılan.</p>
 </main>
 
 <script src="app.js"></script>

@@ -1,24 +1,18 @@
-# Gelir-Gider
+# Gelir-Gider Sürüm 4
 
-Mobil uyumlu, sade kişisel gelir-gider takip uygulaması.
+Sade, mobil uyumlu gelir-gider takip uygulaması.
 
-### Para mantığı
-- Kullanılabilir Para = Gelir - Gider - Kasa Transferi
-- Kasada = Kasa Transferi toplamı
-- Toplam Varlık = Gelir - Gider
+- Gelir yeşil
+- Gider kırmızı
+- Kasa transferi sarı
+- 3 kredi kartı harcama toplamı
+- Aylık özet
+- İşlem ekleme/silme
+- Tüm verileri temizleme
+- JSON yedekleme
 
-Kasa transferi gider değildir; para sadece kasaya taşınır.
+Net hesabı:
 
-## GitHub Pages
-1. Bu dosyaları bir GitHub repository'sine yükle.
-2. Settings → Pages.
-3. Deploy from branch → `main` → `/root`.
-4. Oluşan GitHub Pages adresini telefonda aç.
-5. Tarayıcı menüsünden Ana Ekrana Ekle.
+Gelir - Gider - Kasaya Aktarılan
 
-## Not
-İlk sürüm verileri tarayıcının localStorage alanında tutar. Telefon ve bilgisayar arasında ortak veri için sonraki aşamada Supabase gibi bir bulut veritabanı eklenebilir.
-
-
-## Temiz sürüm
-Bu sürüm örnek/test para kayıtları içermez. İlk açılış boştur. `Tüm Verileri Temizle` ile cihazdaki kayıtlar sıfırlanabilir.
+Bu sürümde örnek/test para kaydı yoktur. Eski sürümlerdeki `gelirGiderV1` verileri özellikle okunmaz; bu nedenle eski test kayıtları bu sürümde görünmez.
