@@ -1,3 +1,3 @@
-# Gelir-Gider Sürüm 6
+# Gelir-Gider V1.0
 
-Gider işlemlerinde Nakit / Kredi Kartı seçimi eklendi. Kartlı harcamalar kart toplamlarına ve aylık kart tablosuna dahil edilir; nakit harcamalar kredi kartı toplamlarına dahil edilmez.
+İsimli 3 kredi kartı, kart limitleri, nakit/kart ayrımı, kategoriler, aylık kart harcamaları, aylık özet, silme ve JSON yedekleme.

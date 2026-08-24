@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1f4e78">
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
@@ -13,12 +13,23 @@
   <div><h1>Gelir · Gider</h1><div class="sub">Kişisel para takibi</div></div>
   <button id="exportBtn" class="ghost">Yedekle</button>
 </header>
+
 <main>
   <section class="summary">
     <div class="card income"><span>Toplam Gelir</span><strong id="totalIncome">0 ₺</strong></div>
     <div class="card expense"><span>Toplam Gider</span><strong id="totalExpense">0 ₺</strong></div>
     <div class="card net"><span>Net</span><strong id="net">0 ₺</strong></div>
     <div class="card transfer"><span>Kasaya Aktarılan</span><strong id="totalTransfer">0 ₺</strong></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Kredi Kartları</h2><span class="muted">Kart isimlerini ve limitlerini buradan ayarla</span></div>
+    <div class="card-settings">
+      <div><label>Kart 1 adı<input id="cardName1" placeholder="Örn. Garanti Bonus"></label><label>Limit<input id="cardLimit1" type="number" min="0" step="0.01" placeholder="0"></label></div>
+      <div><label>Kart 2 adı<input id="cardName2" placeholder="Örn. World"></label><label>Limit<input id="cardLimit2" type="number" min="0" step="0.01" placeholder="0"></label></div>
+      <div><label>Kart 3 adı<input id="cardName3" placeholder="Örn. Bankkart"></label><label>Limit<input id="cardLimit3" type="number" min="0" step="0.01" placeholder="0"></label></div>
+    </div>
+    <button id="saveCardsBtn" class="primary small">Kart Ayarlarını Kaydet</button>
   </section>
 
   <section class="panel">
@@ -35,11 +46,10 @@
         <option value="Nakit">Nakit</option>
         <option value="Kredi Kartı">Kredi Kartı</option>
       </select>
-      <select id="card" disabled>
-        <option value="">Kart seç</option>
-        <option value="Kart 1">Kart 1</option>
-        <option value="Kart 2">Kart 2</option>
-        <option value="Kart 3">Kart 3</option>
+      <select id="card" disabled><option value="">Kart seç</option></select>
+      <select id="category">
+        <option>Genel</option><option>Market</option><option>Fatura</option><option>Kira</option>
+        <option>Yakıt</option><option>Yemek</option><option>Giyim</option><option>Sağlık</option><option>Diğer</option>
       </select>
       <input id="amount" type="number" step="0.01" min="0.01" placeholder="Tutar" required>
       <button class="primary" type="submit">+ EKLE</button>
@@ -47,19 +57,14 @@
   </section>
 
   <section class="panel">
-    <div class="panel-head"><h2>Kredi Kartları</h2><span class="muted">Kartlı harcama toplamı</span></div>
-    <div class="cards">
-      <div><span>Kart 1</span><strong id="card1">0 ₺</strong></div>
-      <div><span>Kart 2</span><strong id="card2">0 ₺</strong></div>
-      <div><span>Kart 3</span><strong id="card3">0 ₺</strong></div>
-      <div class="all"><span>3 Kart Toplam</span><strong id="cardsTotal">0 ₺</strong></div>
-    </div>
+    <div class="panel-head"><h2>Kredi Kartı Özeti</h2><span class="muted">Toplam harcama / limit</span></div>
+    <div id="cardSummary" class="cards"></div>
   </section>
 
   <section class="panel">
-    <div class="panel-head"><h2>Kredi Kartları — Aylık</h2><span class="muted">Sadece kartlı harcamalar</span></div>
+    <div class="panel-head"><h2>Aylık Kredi Kartı Harcamaları</h2><span class="muted">Kart bazında</span></div>
     <div class="table-wrap">
-      <table><thead><tr><th>Ay</th><th>Kart 1</th><th>Kart 2</th><th>Kart 3</th><th>Toplam</th></tr></thead>
+      <table><thead><tr><th>Ay</th><th id="mh1">Kart 1</th><th id="mh2">Kart 2</th><th id="mh3">Kart 3</th><th>Toplam</th></tr></thead>
       <tbody id="cardMonthlyList"></tbody></table>
       <div id="cardMonthlyEmpty" class="empty">Henüz kart harcaması yok.</div>
     </div>
@@ -76,18 +81,17 @@
   </section>
 
   <section class="panel">
-    <div class="panel-head">
-      <h2>İşlemler</h2>
-      <div class="actions"><button id="clearBtn" class="danger-outline">Seçiliyi Sil</button><button id="clearAllBtn" class="danger-outline">Tüm Verileri Temizle</button></div>
+    <div class="panel-head"><h2>İşlemler</h2>
+      <div class="actions"><button id="clearBtn" class="danger-outline">Seçiliyi Sil</button><button id="clearAllBtn" class="danger-outline">Tümünü Temizle</button></div>
     </div>
     <div class="table-wrap">
-      <table><thead><tr><th></th><th>Tarih</th><th>Açıklama</th><th>Tür</th><th>Ödeme</th><th>Kart</th><th>Tutar</th></tr></thead>
+      <table><thead><tr><th></th><th>Tarih</th><th>Açıklama</th><th>Kategori</th><th>Tür</th><th>Ödeme</th><th>Kart</th><th>Tutar</th></tr></thead>
       <tbody id="list"></tbody></table>
       <div id="empty" class="empty">Henüz işlem yok.</div>
     </div>
   </section>
-  <p class="note">Giderlerde Nakit veya Kredi Kartı seçebilirsin. Net = Gelir − Gider − Kasaya Aktarılan.</p>
+  <p class="note">Net = Gelir − Gider − Kasaya Aktarılan. Kredi kartı harcaması giderdir; kart ödemesini ayrıca gider olarak kaydetme.</p>
 </main>
-<script src="app.js?v=6"></script>
+<script src="app.js?v=10"></script>
 </body>
 </html>
