@@ -1,18 +1,3 @@
-# Gelir-Gider Sürüm 4
+# Gelir-Gider Sürüm 6
 
-Sade, mobil uyumlu gelir-gider takip uygulaması.
-
-- Gelir yeşil
-- Gider kırmızı
-- Kasa transferi sarı
-- 3 kredi kartı harcama toplamı
-- Aylık özet
-- İşlem ekleme/silme
-- Tüm verileri temizleme
-- JSON yedekleme
-
-Net hesabı:
-
-Gelir - Gider - Kasaya Aktarılan
-
-Bu sürümde örnek/test para kaydı yoktur. Eski sürümlerdeki `gelirGiderV1` verileri özellikle okunmaz; bu nedenle eski test kayıtları bu sürümde görünmez.
+Gider işlemlerinde Nakit / Kredi Kartı seçimi eklendi. Kartlı harcamalar kart toplamlarına ve aylık kart tablosuna dahil edilir; nakit harcamalar kredi kartı toplamlarına dahil edilmez.

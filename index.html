@@ -10,13 +10,9 @@
 </head>
 <body>
 <header>
-  <div>
-    <h1>Gelir · Gider</h1>
-    <div class="sub">Kişisel para takibi</div>
-  </div>
+  <div><h1>Gelir · Gider</h1><div class="sub">Kişisel para takibi</div></div>
   <button id="exportBtn" class="ghost">Yedekle</button>
 </header>
-
 <main>
   <section class="summary">
     <div class="card income"><span>Toplam Gelir</span><strong id="totalIncome">0 ₺</strong></div>
@@ -35,8 +31,12 @@
         <option value="Gelir">Gelir</option>
         <option value="Kasa Transferi">Kasa Transferi</option>
       </select>
-      <select id="card">
-        <option value="">Kart yok</option>
+      <select id="payment">
+        <option value="Nakit">Nakit</option>
+        <option value="Kredi Kartı">Kredi Kartı</option>
+      </select>
+      <select id="card" disabled>
+        <option value="">Kart seç</option>
         <option value="Kart 1">Kart 1</option>
         <option value="Kart 2">Kart 2</option>
         <option value="Kart 3">Kart 3</option>
@@ -47,10 +47,7 @@
   </section>
 
   <section class="panel">
-    <div class="panel-head">
-      <h2>Kredi Kartları</h2>
-      <span class="muted">Harcama toplamı</span>
-    </div>
+    <div class="panel-head"><h2>Kredi Kartları</h2><span class="muted">Kartlı harcama toplamı</span></div>
     <div class="cards">
       <div><span>Kart 1</span><strong id="card1">0 ₺</strong></div>
       <div><span>Kart 2</span><strong id="card2">0 ₺</strong></div>
@@ -60,10 +57,16 @@
   </section>
 
   <section class="panel">
-    <div class="panel-head">
-      <h2>Aylık Özet</h2>
-      <select id="monthFilter"><option value="all">Tüm Aylar</option></select>
+    <div class="panel-head"><h2>Kredi Kartları — Aylık</h2><span class="muted">Sadece kartlı harcamalar</span></div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Ay</th><th>Kart 1</th><th>Kart 2</th><th>Kart 3</th><th>Toplam</th></tr></thead>
+      <tbody id="cardMonthlyList"></tbody></table>
+      <div id="cardMonthlyEmpty" class="empty">Henüz kart harcaması yok.</div>
     </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Aylık Özet</h2><select id="monthFilter"><option value="all">Tüm Aylar</option></select></div>
     <div class="month-grid">
       <div><span>Gelir</span><strong id="monthIncome">0 ₺</strong></div>
       <div><span>Gider</span><strong id="monthExpense">0 ₺</strong></div>
@@ -75,25 +78,16 @@
   <section class="panel">
     <div class="panel-head">
       <h2>İşlemler</h2>
-      <div class="actions">
-        <button id="clearBtn" class="danger-outline">Seçiliyi Sil</button>
-        <button id="clearAllBtn" class="danger-outline">Tüm Verileri Temizle</button>
-      </div>
+      <div class="actions"><button id="clearBtn" class="danger-outline">Seçiliyi Sil</button><button id="clearAllBtn" class="danger-outline">Tüm Verileri Temizle</button></div>
     </div>
     <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th></th><th>Tarih</th><th>Açıklama</th><th>Tür</th><th>Kart</th><th>Tutar</th></tr>
-        </thead>
-        <tbody id="list"></tbody>
-      </table>
+      <table><thead><tr><th></th><th>Tarih</th><th>Açıklama</th><th>Tür</th><th>Ödeme</th><th>Kart</th><th>Tutar</th></tr></thead>
+      <tbody id="list"></tbody></table>
       <div id="empty" class="empty">Henüz işlem yok.</div>
     </div>
   </section>
-
-  <p class="note">Veriler bu cihazın tarayıcısında saklanır. Net = Gelir − Gider − Kasaya Aktarılan.</p>
+  <p class="note">Giderlerde Nakit veya Kredi Kartı seçebilirsin. Net = Gelir − Gider − Kasaya Aktarılan.</p>
 </main>
-
-<script src="app.js?v=4"></script>
+<script src="app.js?v=6"></script>
 </body>
 </html>
