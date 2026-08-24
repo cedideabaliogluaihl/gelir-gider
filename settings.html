@@ -1,40 +1,18 @@
 <!doctype html>
 <html lang="tr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1f4e78">
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.css">
-<title>Ayarlar - Gelir Gider</title>
-</head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1f4e78"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="style.css"><title>Ayarlar - Gelir Gider</title></head>
 <body>
-<header>
-  <div><h1>Ayarlar</h1><div class="sub">Sabit bilgileri burada yönet</div></div>
-  <a class="ghost link-btn" href="index.html">← Ana Sayfa</a>
-</header>
+<header><div><h1>Ayarlar</h1><div class="sub">Sabit bilgileri burada yönet</div></div><a class="ghost link-btn" href="index.html">← Ana Sayfa</a></header>
 <main>
-  <section class="panel">
-    <div class="panel-head"><h2>Kredi Kartları</h2><span class="muted">Kart adı ve limiti</span></div>
-    <div class="settings-grid">
-      <div class="setting-card"><h3>Kart 1</h3><label>Kart adı<input id="cardName1" placeholder="Örn. Troy Türkiye Finans"></label><label>Kart limiti<input id="cardLimit1" type="number" min="0" step="0.01" placeholder="0"></label></div>
-      <div class="setting-card"><h3>Kart 2</h3><label>Kart adı<input id="cardName2" placeholder="Örn. Troy Yapı Kredi"></label><label>Kart limiti<input id="cardLimit2" type="number" min="0" step="0.01" placeholder="0"></label></div>
-      <div class="setting-card"><h3>Kart 3</h3><label>Kart adı<input id="cardName3" placeholder="Örn. Kuveyt Türk"></label><label>Kart limiti<input id="cardLimit3" type="number" min="0" step="0.01" placeholder="0"></label></div>
-    </div>
-    <button id="saveCardsBtn" class="primary">Kart Ayarlarını Kaydet</button>
-  </section>
-
-  <section class="panel">
-    <div class="panel-head"><h2>Gider Kategorileri</h2><span class="muted">İşlem ekranındaki liste</span></div>
-    <div id="categories" class="category-list"></div>
-    <div class="add-category"><input id="newCategory" placeholder="Yeni kategori adı"><button id="addCategoryBtn" class="primary">+ Ekle</button></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-head"><h2>Uygulama Bilgileri</h2></div>
-    <p class="note">Buradaki kart isimleri ve limitler ana ekrandaki tüm kart seçimlerine ve aylık tablolara otomatik uygulanır. Kart isimlerini değiştirmen eski kayıtları silmez.</p>
-  </section>
+<section class="panel"><div class="panel-head"><h2>Kredi Kartları</h2><span class="muted">Kart adı ve limiti</span></div>
+<div class="settings-grid">
+<div class="setting-card"><h3>Kart 1</h3><label>Kart adı<input id="cardName1" placeholder="Örn. Troy Türkiye Finans"></label><label>Kart limiti<input id="cardLimit1" type="number" min="0" step="0.01"></label></div>
+<div class="setting-card"><h3>Kart 2</h3><label>Kart adı<input id="cardName2" placeholder="Örn. Troy Yapı Kredi"></label><label>Kart limiti<input id="cardLimit2" type="number" min="0" step="0.01"></label></div>
+<div class="setting-card"><h3>Kart 3</h3><label>Kart adı<input id="cardName3" placeholder="Örn. Kuveyt Türk"></label><label>Kart limiti<input id="cardLimit3" type="number" min="0" step="0.01"></label></div>
+</div><button id="saveCardsBtn" class="primary">Kart Ayarlarını Kaydet</button></section>
+<section class="panel"><div class="panel-head"><h2>Gider Kategorileri</h2><span class="muted">İşlem ekranındaki liste</span></div>
+<div id="categories" class="category-list"></div><div class="add-category"><input id="newCategory" placeholder="Yeni kategori adı"><button id="addCategoryBtn" class="primary">+ Ekle</button></div></section>
+<section class="panel"><h2>Not</h2><p class="note">Kart isimleri değiştiğinde eski kart kayıtları korunur. Taksit sayısı ve alışveriş bilgisi ise her işlem sırasında girilir.</p></section>
 </main>
-<script src="settings.js?v=11"></script>
-</body>
-</html>
+<script src="settings.js?v=12"></script>
+</body></html>

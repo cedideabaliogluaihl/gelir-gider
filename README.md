@@ -1,3 +1,3 @@
-# Gelir-Gider V1.1
+# Gelir-Gider V1.2
 
-Ana ekran sadeleştirildi. Kart isimleri, kart limitleri ve gider kategorileri ayrı Ayarlar sayfasına taşındı. Kart seçiminde ayarlardaki gerçek isimler gösterilir.
+İsimli kredi kartları, nakit/kart ayrımı ve taksitli alışveriş takibi. Taksitli işlemde girilen tutar toplam alışveriş tutarıdır; aylık gider hesabına ilgili ayın taksiti dağıtılır.
