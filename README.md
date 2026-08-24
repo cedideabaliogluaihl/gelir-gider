@@ -1,3 +1,3 @@
-# Gelir-Gider V1.0
+# Gelir-Gider V1.1
 
-İsimli 3 kredi kartı, kart limitleri, nakit/kart ayrımı, kategoriler, aylık kart harcamaları, aylık özet, silme ve JSON yedekleme.
+Ana ekran sadeleştirildi. Kart isimleri, kart limitleri ve gider kategorileri ayrı Ayarlar sayfasına taşındı. Kart seçiminde ayarlardaki gerçek isimler gösterilir.
