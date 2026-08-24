@@ -4,6 +4,7 @@ const $=id=>document.getElementById(id);
 const money=n=>new Intl.NumberFormat("tr-TR",{style:"currency",currency:"TRY",maximumFractionDigits:2}).format(n);
 const today=new Date();
 $("date").value=today.toISOString().slice(0,10);
+$("card").disabled=false;
 
 function save(){localStorage.setItem(KEY,JSON.stringify(items)); render();}
 function totals(rows){
@@ -17,8 +18,9 @@ function render(){
   const t=totals(items);
   $("totalIncome").textContent=money(t.income);
   $("totalExpense").textContent=money(t.expense);
-  $("net").textContent=money(t.income-t.expense);
+  $("net").textContent=money(t.income-t.expense-t.transfer);
   $("totalTransfer").textContent=money(t.transfer);
+  $("totalAssets").textContent=money(t.income-t.expense);
 
   ["Kart 1","Kart 2","Kart 3"].forEach((c,i)=>{
     const v=items.filter(x=>x.type==="Gider"&&x.card===c).reduce((s,x)=>s+x.amount,0);
@@ -37,8 +39,9 @@ function render(){
   const mt=totals(filtered);
   $("monthIncome").textContent=money(mt.income);
   $("monthExpense").textContent=money(mt.expense);
-  $("monthNet").textContent=money(mt.income-mt.expense);
+  $("monthNet").textContent=money(mt.income-mt.expense-mt.transfer);
   $("monthTransfer").textContent=money(mt.transfer);
+  $("monthAssets").textContent=money(mt.income-mt.expense);
 
   $("list").innerHTML=filtered.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`
     <tr class="${x.type==="Gelir"?"income":x.type==="Gider"?"expense":"transfer"}">

@@ -2,6 +2,13 @@
 
 Mobil uyumlu, sade kişisel gelir-gider takip uygulaması.
 
+### Para mantığı
+- Kullanılabilir Para = Gelir - Gider - Kasa Transferi
+- Kasada = Kasa Transferi toplamı
+- Toplam Varlık = Gelir - Gider
+
+Kasa transferi gider değildir; para sadece kasaya taşınır.
+
 ## GitHub Pages
 1. Bu dosyaları bir GitHub repository'sine yükle.
 2. Settings → Pages.
