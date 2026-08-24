@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1f4e78">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+<title>Gelir Gider</title>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Gelir · Gider</h1>
+    <div class="sub">Kişisel para takibi</div>
+  </div>
+  <button id="exportBtn" class="ghost">Yedekle</button>
+</header>
+
+<main>
+  <section class="summary">
+    <div class="card income"><span>Toplam Gelir</span><strong id="totalIncome">0 ₺</strong></div>
+    <div class="card expense"><span>Toplam Gider</span><strong id="totalExpense">0 ₺</strong></div>
+    <div class="card net"><span>Net</span><strong id="net">0 ₺</strong></div>
+    <div class="card transfer"><span>Kasaya Aktarılan</span><strong id="totalTransfer">0 ₺</strong></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Yeni İşlem</h2>
+    </div>
+    <form id="form">
+      <input id="date" type="date" required>
+      <input id="description" type="text" placeholder="Açıklama" required>
+      <select id="type">
+        <option>Gider</option>
+        <option>Gelir</option>
+        <option>Kasa Transferi</option>
+      </select>
+      <select id="card">
+        <option value="">Kart yok</option>
+        <option>Kart 1</option>
+        <option>Kart 2</option>
+        <option>Kart 3</option>
+      </select>
+      <input id="amount" type="number" step="0.01" min="0.01" placeholder="Tutar" required>
+      <button class="primary" type="submit">+ EKLE</button>
+    </form>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Kredi Kartları</h2>
+      <span class="muted">Harcama toplamı</span>
+    </div>
+    <div class="cards">
+      <div><span>Kart 1</span><strong id="card1">0 ₺</strong></div>
+      <div><span>Kart 2</span><strong id="card2">0 ₺</strong></div>
+      <div><span>Kart 3</span><strong id="card3">0 ₺</strong></div>
+      <div class="all"><span>3 Kart Toplam</span><strong id="cardsTotal">0 ₺</strong></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Aylık Özet</h2>
+      <select id="monthFilter"></select>
+    </div>
+    <div class="month-grid">
+      <div><span>Gelir</span><strong id="monthIncome">0 ₺</strong></div>
+      <div><span>Gider</span><strong id="monthExpense">0 ₺</strong></div>
+      <div><span>Net</span><strong id="monthNet">0 ₺</strong></div>
+      <div><span>Kasaya Aktarılan</span><strong id="monthTransfer">0 ₺</strong></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>İşlemler</h2>
+      <button id="clearBtn" class="danger-outline">Seçiliyi Sil</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th></th><th>Tarih</th><th>Açıklama</th><th>Tür</th><th>Kart</th><th>Tutar</th></tr></thead>
+        <tbody id="list"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="note">Veriler bu cihazın tarayıcısında saklanır. “Yedekle” ile JSON dosyası indirebilirsin.</p>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
