@@ -1,22 +1,28 @@
 <!doctype html><html lang="tr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1f4e78"><link rel="stylesheet" href="style.css"><title>Kredi Kartı Taksitleri</title></head>
+<meta name="theme-color" content="#1f4e78"><link rel="stylesheet" href="style.css"><title>Kredi Kartı Taksitleri V2.0</title></head>
 <body><header><div><h1>Kredi Kartı Taksitleri</h1><div class="sub">Aylık ve ileri dönem planı</div></div><a class="ghost link-btn" href="index.html">← Ana Sayfa</a></header><main>
 <section class="panel"><div class="panel-head"><div><h2>Aylık Kredi Kartı Harcamaları</h2><span class="muted">Taksitler ilgili aylara dağıtılır</span></div></div>
 <div class="table-wrap"><table><thead><tr><th>Ay</th><th id="h1">Kart 1</th><th id="h2">Kart 2</th><th id="h3">Kart 3</th><th>Toplam</th></tr></thead><tbody id="months"></tbody></table></div></section>
 <section class="panel"><div class="panel-head"><div><h2>Yaklaşan Taksitler</h2><span class="muted">Önümüzdeki 12 ay</span></div></div>
 <div class="table-wrap"><table><thead><tr><th>Ay</th><th>Kart</th><th>Alışveriş</th><th>Taksit</th></tr></thead><tbody id="upcoming"></tbody></table></div></section>
-</main><script>
-const K="gelirGiderV4",S="gelirGiderSettingsV1";let items=[],set={cards:[{name:"Kart 1"},{name:"Kart 2"},{name:"Kart 3"}]};
-const money=n=>new Intl.NumberFormat("tr-TR",{style:"currency",currency:"TRY"}).format(n),esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-function ym(d){return d.slice(0,7)} function add(z,n){let[y,m]=z.split("-").map(Number);m+=n;y+=Math.floor((m-1)/12);m=(m-1)%12+1;return y+"-"+String(m).padStart(2,"0")}
-function ce(x){return x.type==="Gider"&&x.payment==="Kredi Kartı"&&x.card?.startsWith("c")}function cnt(x){return Math.max(1,Number(x.installments)||1)}
+</main><script type="module">
+import { firebaseReady } from "./firebase-core.js";
+let items=[],set={cards:[{name:"Kart 1"},{name:"Kart 2"},{name:"Kart 3"}]};
+const money=n=>new Intl.NumberFormat("tr-TR",{style:"currency",currency:"TRY"}).format(n),esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+function ym(d){return d.slice(0,7)}
+function add(z,n){let[y,m]=z.split("-").map(Number);m+=n;y+=Math.floor((m-1)/12);m=(m-1)%12+1;return y+"-"+String(m).padStart(2,"0")}
+function ce(x){return x.type==="Gider"&&x.payment==="Kredi Kartı"&&x.card?.startsWith("c")}
+function cnt(x){return Math.max(1,Number(x.installments)||1)}
 function due(x,m){if(!ce(x))return 0;let s=ym(x.date),d=(+m.slice(0,4)-+s.slice(0,4))*12+(+m.slice(5)-+s.slice(5));return d>=0&&d<cnt(x)?x.amount/cnt(x):0}
-try{items=JSON.parse(localStorage.getItem(K)||"[]");set=JSON.parse(localStorage.getItem(S)||JSON.stringify(set))}catch{}
-document.getElementById("h1").textContent=set.cards[0].name;document.getElementById("h2").textContent=set.cards[1].name;document.getElementById("h3").textContent=set.cards[2].name;
-let now=new Date().toISOString().slice(0,7),rows="";
-for(let i=0;i<36;i++){let m=add(now,i),v=[0,0,0];items.forEach(x=>{if(ce(x))v[+x.card.slice(1)]+=due(x,m)});let l=new Date(m+"-01T00:00:00").toLocaleDateString("tr-TR",{month:"long",year:"numeric"});rows+=`<tr><td>${l}</td><td>${money(v[0])}</td><td>${money(v[1])}</td><td>${money(v[2])}</td><td class="month-card-total">${money(v[0]+v[1]+v[2])}</td></tr>`}
-document.getElementById("months").innerHTML=rows;
-let up="";for(let i=0;i<12;i++){let m=add(now,i);items.filter(ce).forEach(x=>{let d=due(x,m);if(d){let s=ym(x.date),no=(+m.slice(0,4)-+s.slice(0,4))*12+(+m.slice(5)-+s.slice(5))+1;up+=`<tr><td>${new Date(m+"-01T00:00:00").toLocaleDateString("tr-TR",{month:"long",year:"numeric"})}</td><td>${esc(set.cards[+x.card.slice(1)].name)}</td><td>${esc(x.description)}</td><td>${no}/${cnt(x)} · ${money(d)}</td></tr>`}})}
-document.getElementById("upcoming").innerHTML=up||'<tr><td colspan="4" class="empty">Yaklaşan taksit yok.</td></tr>';
+async function main(){
+ const data=await firebaseReady();items=data.items;set=data.settings;
+ document.getElementById("h1").textContent=set.cards[0].name;document.getElementById("h2").textContent=set.cards[1].name;document.getElementById("h3").textContent=set.cards[2].name;
+ let now=new Date().toISOString().slice(0,7),rows="";
+ for(let i=0;i<36;i++){let m=add(now,i),v=[0,0,0];items.forEach(x=>{if(ce(x))v[+x.card.slice(1)]+=due(x,m)});let l=new Date(m+"-01T00:00:00").toLocaleDateString("tr-TR",{month:"long",year:"numeric"});rows+=`<tr><td>${l}</td><td>${money(v[0])}</td><td>${money(v[1])}</td><td>${money(v[2])}</td><td class="month-card-total">${money(v[0]+v[1]+v[2])}</td></tr>`}
+ document.getElementById("months").innerHTML=rows;
+ let up="";for(let i=0;i<12;i++){let m=add(now,i);items.filter(ce).forEach(x=>{let d=due(x,m);if(d){let s=ym(x.date),no=(+m.slice(0,4)-+s.slice(0,4))*12+(+m.slice(5)-+s.slice(5))+1;up+=`<tr><td>${new Date(m+"-01T00:00:00").toLocaleDateString("tr-TR",{month:"long",year:"numeric"})}</td><td>${esc(set.cards[+x.card.slice(1)]?.name||"-")}</td><td>${esc(x.description)}</td><td>${no}/${cnt(x)} · ${money(d)}</td></tr>`}})}
+ document.getElementById("upcoming").innerHTML=up||'<tr><td colspan="4" class="empty">Yaklaşan taksit yok.</td></tr>';
+}
+main().catch(e=>alert("Firebase bağlantısı kurulamadı: "+e.message));
 </script></body></html>

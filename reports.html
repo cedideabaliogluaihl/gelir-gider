@@ -57,8 +57,9 @@
 <p class="note">Eski kayıtların silinmez. Raporlardaki <b>Düzenle</b> butonuyla kategori, açıklama, tarih veya tutarı değiştirebilirsin.</p>
 </main>
 
-<script>
-const KEY="gelirGiderV4", SET="gelirGiderSettingsV1";
+<script type="module">
+import { firebaseReady, getItems, getSettings, saveItems } from "./firebase-core.js";
+
 let items=[], settings={
  incomeCategories:["Maaş","Ek Ders","Diğer Gelir"],
  expenseCategories:["Kira","Market","Fatura","Yakıt","Nakit","Diğer Gider"]
@@ -66,13 +67,6 @@ let items=[], settings={
 const $=id=>document.getElementById(id);
 const money=n=>new Intl.NumberFormat("tr-TR",{style:"currency",currency:"TRY",maximumFractionDigits:2}).format(n);
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-function load(){
- try{items=JSON.parse(localStorage.getItem(KEY)||"[]");settings=JSON.parse(localStorage.getItem(SET)||JSON.stringify(settings))}catch{}
- if(!Array.isArray(items))items=[];
- if(!Array.isArray(settings.incomeCategories)||!settings.incomeCategories.length)settings.incomeCategories=["Maaş","Ek Ders","Diğer Gelir"];
- if(!Array.isArray(settings.expenseCategories)||!settings.expenseCategories.length)settings.expenseCategories=["Kira","Market","Fatura","Yakıt","Nakit","Diğer Gider"];
-}
-function save(){localStorage.setItem(KEY,JSON.stringify(items))}
 function isCard(x){return x.type==="Gider"&&x.payment==="Kredi Kartı"&&x.card?.startsWith("c")}
 function inst(x){return Math.max(1,Number(x.installments)||1)}
 function ym(d){return String(d).slice(0,7)}
@@ -194,7 +188,7 @@ function openEdit(id){
    const category=modal.querySelector("#edCat").value;
    if(!date||!desc||!amount||amount<=0){alert("Tarih, açıklama ve geçerli tutar gerekli.");return;}
    x.date=date;x.description=desc;x.amount=amount;x.category=category;
-   save();modal.remove();render();
+   save().then(()=>{modal.remove();render()}).catch(err=>alert("Kaydedilemedi: "+err.message));
  };
 }
 
@@ -204,10 +198,16 @@ document.addEventListener("click",e=>{
  if(btn){e.preventDefault();openEdit(btn.dataset.id);}
 });
 
-load();populateCategories();
-$("rtype").onchange=()=>{populateCategories();render()};
-$("rcat").onchange=render;
-$("period").onchange=render;
-render();
+async function save(){ await saveItems(items); }
+async function main(){
+ const data=await firebaseReady();
+ items=data.items; settings=data.settings;
+ populateCategories();
+ $("rtype").onchange=()=>{populateCategories();render()};
+ $("rcat").onchange=render;
+ $("period").onchange=render;
+ render();
+}
+main().catch(e=>{console.error(e);alert("Firebase bağlantısı kurulamadı: "+e.message)});
 </script>
 </body></html>
