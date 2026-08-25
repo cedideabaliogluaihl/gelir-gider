@@ -98,6 +98,7 @@ function openEdit(id){
    save();modal.remove();render();
  };
 }
+function bindEditButtons(){bindEditButtons();}
 function render(){
   const type=$("rtype").value,cat=$("rcat").value,period=$("period").value,now=new Date().toISOString().slice(0,7);
   let months=[];
@@ -138,7 +139,7 @@ function render(){
   details.sort((a,b)=>b.x.date.localeCompare(a.x.date));
   details.forEach(d=>{const key=d.x.id+"-"+d.v;if(!seen.has(key)){seen.add(key);rows.push(d)}});
   $("detailList").innerHTML=rows.map(d=>`<tr><td>${new Date(d.x.date+"T00:00:00").toLocaleDateString("tr-TR")}</td><td>${esc(d.x.description)}</td><td>${esc(d.x.category||"Kategorisiz")}</td><td class="amount">${money(d.v)}</td><td><button class="editBtn" data-id="${d.x.id}">Düzenle</button></td></tr>`).join("")||'<tr><td colspan="4" class="empty">Kayıt bulunamadı.</td></tr>';
-  renderUncategorized();
+ bindEditButtons();  renderUncategorized();
 }
 function renderUncategorized(){
   const rows=items.filter(x=>(x.type==="Gelir"||x.type==="Gider")&&!x.category);
