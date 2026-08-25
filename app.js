@@ -79,7 +79,9 @@ function render(){
       <td>${isCard(x)?esc(settings.cards[+x.card.slice(1)]?.name||"-"):"-"}</td>
       <td>${isCard(x)?(installments(x)>1?installments(x)+" taksit":"Tek çekim"):"-"}</td>
       <td class="amount">${money(isCard(x)?x.amount/installments(x):x.amount)}</td>
+      <td><button class="editBtn" data-id="${x.id}">Düzenle</button></td>
     </tr>`).join("");
+  document.querySelectorAll(".editBtn").forEach(btn=>btn.onclick=()=>editItem(Number(btn.dataset.id)));
   $("empty").style.display=sorted.length?"none":"block";
 }
 $("date").value=currentMonth()+"-"+String(new Date().getDate()).padStart(2,"0");
@@ -103,6 +105,33 @@ $("amount").oninput=()=>{
 };
 $("installmentCount").onchange=$("amount").oninput;
 
+
+function editItem(id){
+ const x=items.find(v=>v.id===id);
+ if(!x)return;
+ const arr=x.type==="Gelir"?settings.incomeCategories:settings.expenseCategories;
+ const modal=document.createElement("div");
+ modal.className="edit-modal";
+ modal.innerHTML=`<div class="edit-box">
+   <h2>İşlemi Düzenle</h2>
+   <div class="edit-grid">
+    <label>Tarih<input id="mDate" type="date" value="${esc(x.date)}"></label>
+    <label>Açıklama<input id="mDesc" value="${esc(x.description)}"></label>
+    <label>Tutar<input id="mAmount" type="number" step="0.01" min="0.01" value="${Number(x.amount)}"></label>
+    <label>Kategori<select id="mCat"><option value="">Kategorisiz</option>${arr.map(c=>`<option value="${esc(c)}" ${x.category===c?"selected":""}>${esc(c)}</option>`).join("")}</select></label>
+   </div>
+   <div class="edit-actions"><button id="mCancel" class="ghost">Vazgeç</button><button id="mSave" class="primary">Kaydet</button></div>
+ </div>`;
+ document.body.appendChild(modal);
+ modal.querySelector("#mCancel").onclick=()=>modal.remove();
+ modal.onclick=e=>{if(e.target===modal)modal.remove()};
+ modal.querySelector("#mSave").onclick=()=>{
+  const desc=modal.querySelector("#mDesc").value.trim(),amount=Number(modal.querySelector("#mAmount").value),date=modal.querySelector("#mDate").value;
+  if(!desc)return alert("Açıklama gir."); if(!date)return alert("Tarih seç."); if(!amount||amount<=0)return alert("Geçerli tutar gir.");
+  x.date=date;x.description=desc;x.amount=amount;x.category=modal.querySelector("#mCat").value;
+  save();modal.remove();
+ };
+}
 $("form").onsubmit=e=>{
   e.preventDefault();
   const type=$("type").value,amount=Number($("amount").value);

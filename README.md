@@ -1,7 +1,8 @@
-# Gelir-Gider V1.6
+# Gelir-Gider V1.7
 
-Raporlar sayfasında “Kategorisiz Eski Kayıtlar” seçeneği HTML içinde doğrudan bulunur.
-V1.6 sürümü sayfa başlığında görünür.
-Eski kategorisiz kayıtlar korunur ve tek tek kategori atanabilir.
-Yeni gelir/gider kayıtlarında kategori zorunludur.
-Ana ekran yalnızca güncel ayı gösterir.
+- Ana ekran yalnızca güncel ayı gösterir.
+- Ana ekran ve Raporlar kayıtlarında **Düzenle** butonu vardır.
+- Düzenle ile tarih, açıklama, tutar ve kategori değiştirilebilir.
+- Eski kategorisiz kayıtlar silinmez; doğrudan Düzenle ile kategori atanabilir.
+- Raporlar sayfasında Kategorisiz Eski Kayıtlar filtresi de vardır.
+- Yeni Gelir/Gider kayıtlarında kategori zorunludur.
