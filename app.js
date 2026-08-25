@@ -1,10 +1,6 @@
 const KEY = "gelirGiderV4";
 const SET = "gelirGiderSettingsV1";
 
-/* =========================================================
-   FIREBASE AYARLARI
-========================================================= */
-
 const firebaseConfig = {
   apiKey: "AIzaSyC8Pk7DCPwmb5RK2NQCBPEv692-lzeeo4c",
   authDomain: "gelir-gider-546b4.firebaseapp.com",
@@ -14,13 +10,7 @@ const firebaseConfig = {
   appId: "1:682384311790:web:2ba8621cec98145232faff"
 };
 
-/* Firebase SDK sürümü */
-const FB_VERSION = "12.16.0";
-
-
-/* =========================================================
-   UYGULAMA VERİLERİ
-========================================================= */
+const FB_VERSION = "12.18.0";
 
 let items = [];
 
@@ -30,13 +20,11 @@ let settings = {
     { name: "Kart 2", limit: 0 },
     { name: "Kart 3", limit: 0 }
   ],
-
   incomeCategories: [
     "Maaş",
     "Ek Ders",
     "Diğer Gelir"
   ],
-
   expenseCategories: [
     "Kira",
     "Market",
@@ -47,25 +35,13 @@ let settings = {
   ]
 };
 
-
-/* =========================================================
-   FIREBASE DEĞİŞKENLERİ
-========================================================= */
-
-let firebaseReady = false;
-let currentUser = null;
-
 let firebaseApp = null;
 let auth = null;
 let db = null;
-
-
-/* =========================================================
-   KISA FONKSİYONLAR
-========================================================= */
+let firebaseReady = false;
+let currentUser = null;
 
 const $ = id => document.getElementById(id);
-
 
 const money = n =>
   new Intl.NumberFormat("tr-TR", {
@@ -73,7 +49,6 @@ const money = n =>
     currency: "TRY",
     maximumFractionDigits: 2
   }).format(Number(n) || 0);
-
 
 const esc = s =>
   String(s ?? "").replace(/[&<>"']/g, m => ({
@@ -86,7 +61,7 @@ const esc = s =>
 
 
 /* =========================================================
-   LOCAL STORAGE
+   LOCAL VERİ
 ========================================================= */
 
 function loadLocal() {
@@ -102,44 +77,15 @@ function loadLocal() {
       JSON.stringify(settings)
     );
 
-  } catch (error) {
+  } catch (e) {
 
-    console.error(
-      "Local kayıt okunamadı:",
-      error
-    );
+    console.error(e);
 
-    items = [];
-
-    settings = {
-      cards: [
-        { name: "Kart 1", limit: 0 },
-        { name: "Kart 2", limit: 0 },
-        { name: "Kart 3", limit: 0 }
-      ],
-
-      incomeCategories: [
-        "Maaş",
-        "Ek Ders",
-        "Diğer Gelir"
-      ],
-
-      expenseCategories: [
-        "Kira",
-        "Market",
-        "Fatura",
-        "Yakıt",
-        "Nakit",
-        "Diğer Gider"
-      ]
-    };
   }
-
 
   if (!Array.isArray(items)) {
     items = [];
   }
-
 
   if (
     !Array.isArray(settings.cards) ||
@@ -151,8 +97,8 @@ function loadLocal() {
       { name: "Kart 2", limit: 0 },
       { name: "Kart 3", limit: 0 }
     ];
-  }
 
+  }
 
   if (
     !Array.isArray(settings.incomeCategories) ||
@@ -164,8 +110,8 @@ function loadLocal() {
       "Ek Ders",
       "Diğer Gelir"
     ];
-  }
 
+  }
 
   if (
     !Array.isArray(settings.expenseCategories) ||
@@ -180,6 +126,7 @@ function loadLocal() {
       "Nakit",
       "Diğer Gider"
     ];
+
   }
 }
 
@@ -195,11 +142,12 @@ function saveLocal() {
     SET,
     JSON.stringify(settings)
   );
+
 }
 
 
 /* =========================================================
-   KREDİ KARTI / TAKSİT HESAPLARI
+   KREDİ KARTI
 ========================================================= */
 
 function isCard(x) {
@@ -210,6 +158,7 @@ function isCard(x) {
     typeof x.card === "string" &&
     x.card.startsWith("c")
   );
+
 }
 
 
@@ -219,12 +168,14 @@ function installments(x) {
     1,
     Number(x.installments) || 1
   );
+
 }
 
 
-function ym(date) {
+function ym(d) {
 
-  return String(date).slice(0, 7);
+  return String(d).slice(0, 7);
+
 }
 
 
@@ -234,20 +185,18 @@ function due(x, month) {
     return 0;
   }
 
-
-  const startMonth = ym(x.date);
+  const start = ym(x.date);
 
   const diff =
     (
       Number(month.slice(0, 4)) -
-      Number(startMonth.slice(0, 4))
+      Number(start.slice(0, 4))
     ) * 12
     +
     (
       Number(month.slice(5)) -
-      Number(startMonth.slice(5))
+      Number(start.slice(5))
     );
-
 
   if (
     diff >= 0 &&
@@ -258,10 +207,11 @@ function due(x, month) {
       Number(x.amount) /
       installments(x)
     );
+
   }
 
-
   return 0;
+
 }
 
 
@@ -274,6 +224,7 @@ function currentMonth() {
   return new Date()
     .toISOString()
     .slice(0, 7);
+
 }
 
 
@@ -288,6 +239,7 @@ function monthLabel(month) {
       year: "numeric"
     }
   );
+
 }
 
 
@@ -298,40 +250,78 @@ function monthLabel(month) {
 function populateCategories() {
 
   const type = $("type")?.value;
-
   const select = $("category");
 
   if (!select) {
     return;
   }
 
-
   if (type === "Kasa Transferi") {
 
     select.innerHTML =
-      `<option value="Kasa Transferi">
-        Kasa Transferi
-      </option>`;
+      '<option value="Kasa Transferi">Kasa Transferi</option>';
 
     return;
+
   }
 
-
-  const categories =
+  const list =
     type === "Gelir"
       ? settings.incomeCategories
       : settings.expenseCategories;
 
-
   select.innerHTML =
-    categories
+    list
       .map(
-        category =>
-          `<option value="${esc(category)}">
-            ${esc(category)}
-          </option>`
+        x =>
+          `<option value="${esc(x)}">${esc(x)}</option>`
       )
       .join("");
+
+}
+
+
+/* =========================================================
+   FORM SENKRONİZASYONU
+========================================================= */
+
+function sync() {
+
+  if (!$("type")) {
+    return;
+  }
+
+  const isExpense =
+    $("type").value === "Gider";
+
+  const isCardPayment =
+    isExpense &&
+    $("payment").value === "Kredi Kartı";
+
+  $("payment").disabled =
+    !isExpense;
+
+  $("card").disabled =
+    !isCardPayment;
+
+  $("installmentBox").hidden =
+    !isCardPayment;
+
+  if (!isCardPayment) {
+
+    $("installment").checked =
+      false;
+
+    $("installmentFields").hidden =
+      true;
+
+    $("installmentPreview").textContent =
+      "";
+
+  }
+
+  populateCategories();
+
 }
 
 
@@ -342,11 +332,9 @@ function populateCategories() {
 function render() {
 
   const month = currentMonth();
-
   const label = monthLabel(month);
 
-
-  const currentItems =
+  const current =
     items.filter(
       x =>
         x.date &&
@@ -354,13 +342,9 @@ function render() {
     );
 
 
-  /* GELİR */
-
   const income =
-    currentItems
-      .filter(
-        x => x.type === "Gelir"
-      )
+    current
+      .filter(x => x.type === "Gelir")
       .reduce(
         (sum, x) =>
           sum + Number(x.amount || 0),
@@ -368,10 +352,8 @@ function render() {
       );
 
 
-  /* NAKİT GİDER */
-
   const cashExpense =
-    currentItems
+    current
       .filter(
         x =>
           x.type === "Gider" &&
@@ -383,8 +365,6 @@ function render() {
         0
       );
 
-
-  /* KREDİ KARTI GİDER */
 
   const cardExpense =
     items.reduce(
@@ -399,14 +379,11 @@ function render() {
     cardExpense;
 
 
-  /* KASA TRANSFERİ */
-
   const transfer =
-    currentItems
+    current
       .filter(
         x =>
-          x.type ===
-          "Kasa Transferi"
+          x.type === "Kasa Transferi"
       )
       .reduce(
         (sum, x) =>
@@ -415,24 +392,17 @@ function render() {
       );
 
 
-  /* ÖZET */
-
   if ($("totalIncome")) {
-
     $("totalIncome").textContent =
       money(income);
   }
 
-
   if ($("totalExpense")) {
-
     $("totalExpense").textContent =
       money(expense);
   }
 
-
   if ($("net")) {
-
     $("net").textContent =
       money(
         income -
@@ -441,31 +411,23 @@ function render() {
       );
   }
 
-
   if ($("totalTransfer")) {
-
     $("totalTransfer").textContent =
       money(transfer);
   }
 
-
   if ($("currentMonthLabel")) {
-
     $("currentMonthLabel").textContent =
       label;
   }
 
-
   if ($("transactionsTitle")) {
-
     $("transactionsTitle").textContent =
       `${label} İşlemleri`;
   }
 
 
-  /* =====================================================
-     KREDİ KARTI ÖZETİ
-  ===================================================== */
+  /* KART ÖZETİ */
 
   if ($("cardSummary")) {
 
@@ -473,7 +435,7 @@ function render() {
       settings.cards
         .map((card, index) => {
 
-          const cardValue =
+          const value =
             items.reduce(
               (sum, x) => {
 
@@ -481,7 +443,6 @@ function render() {
                   x.card !==
                   "c" + index
                 ) {
-
                   return sum;
                 }
 
@@ -489,6 +450,7 @@ function render() {
                   sum +
                   due(x, month)
                 );
+
               },
               0
             );
@@ -497,21 +459,18 @@ function render() {
           const limit =
             Number(card.limit) || 0;
 
-
           const remaining =
-            limit -
-            cardValue;
+            limit - value;
 
 
           return `
             <div>
-
               <span>
                 ${esc(card.name)}
               </span>
 
               <strong>
-                ${money(cardValue)}
+                ${money(value)}
               </strong>
 
               <small>
@@ -519,40 +478,31 @@ function render() {
               </small>
 
               <small>
-                Limit:
-                ${money(limit)}
-                · Kalan:
-                ${money(remaining)}
+                Limit: ${money(limit)}
+                · Kalan: ${money(remaining)}
               </small>
-
             </div>
           `;
 
         })
         .join("");
+
   }
 
 
-  /* =====================================================
-     AYLIK ÖZET
-  ===================================================== */
+  /* AYLIK ÖZET */
 
   if ($("monthIncome")) {
-
     $("monthIncome").textContent =
       money(income);
   }
 
-
   if ($("monthExpense")) {
-
     $("monthExpense").textContent =
       money(expense);
   }
 
-
   if ($("monthNet")) {
-
     $("monthNet").textContent =
       money(
         income -
@@ -561,32 +511,25 @@ function render() {
       );
   }
 
-
   if ($("monthTransfer")) {
-
     $("monthTransfer").textContent =
       money(transfer);
   }
 
 
-  /* =====================================================
-     İŞLEMLER
-  ===================================================== */
+  /* İŞLEM LİSTESİ */
 
   const sorted =
-    currentItems
+    current
       .slice()
       .sort(
         (a, b) =>
-          String(b.date)
-            .localeCompare(
-              String(a.date)
-            )
-          ||
-          (
-            Number(b.id) -
-            Number(a.id)
+          String(b.date).localeCompare(
+            String(a.date)
           )
+          ||
+          Number(b.id) -
+          Number(a.id)
       );
 
 
@@ -609,11 +552,9 @@ function render() {
               ? (
                   settings.cards[
                     Number(
-                      x.card
-                        .slice(1)
+                      x.card.slice(1)
                     )
-                  ]?.name ||
-                  "-"
+                  ]?.name || "-"
                 )
               : "-";
 
@@ -629,12 +570,10 @@ function render() {
               : "-";
 
 
-          const displayAmount =
+          const amount =
             isCard(x)
-              ? (
-                  Number(x.amount) /
-                  installments(x)
-                )
+              ? Number(x.amount) /
+                installments(x)
               : Number(x.amount);
 
 
@@ -686,13 +625,11 @@ function render() {
               </td>
 
               <td>
-                ${esc(
-                  installmentText
-                )}
+                ${esc(installmentText)}
               </td>
 
               <td class="amount">
-                ${money(displayAmount)}
+                ${money(amount)}
               </td>
 
             </tr>
@@ -700,6 +637,7 @@ function render() {
 
         })
         .join("");
+
   }
 
 
@@ -709,145 +647,107 @@ function render() {
       sorted.length
         ? "none"
         : "block";
+
   }
+
 }
 
 
 /* =========================================================
-   FORM GÖRÜNÜMÜ
+   FIREBASE BAŞLATMA
 ========================================================= */
 
-function sync() {
-
-  if (!$("type")) {
-    return;
-  }
-
-
-  const isExpense =
-    $("type").value === "Gider";
-
-
-  const isCreditCard =
-    isExpense &&
-    $("payment").value ===
-    "Kredi Kartı";
-
-
-  $("payment").disabled =
-    !isExpense;
-
-
-  $("card").disabled =
-    !isCreditCard;
-
-
-  $("installmentBox").hidden =
-    !isCreditCard;
-
-
-  if (!isCreditCard) {
-
-    $("installment").checked =
-      false;
-
-    $("installmentFields").hidden =
-      true;
-
-    $("installmentPreview")
-      .textContent = "";
-  }
-
-
-  populateCategories();
-}
-
-
-/* =========================================================
-   FIREBASE BAŞLAT
-========================================================= */
-
-async function initializeFirebase() {
+async function initFirebase() {
 
   try {
 
-    /* ---------------------------------------------
-       FIREBASE CORE
-    --------------------------------------------- */
-
-    const {
-      initializeApp
-    } = await import(
-      `https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-app.js`
-    );
+    const firebase =
+      await import(
+        `https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-app.js`
+      );
 
 
     firebaseApp =
-      initializeApp(
+      firebase.initializeApp(
         firebaseConfig
       );
 
 
-    /* ---------------------------------------------
-       AUTH
-    --------------------------------------------- */
-
-    const {
-      initializeAuth,
-      browserLocalPersistence,
-      GoogleAuthProvider,
-      signInWithPopup,
-      signOut,
-      onAuthStateChanged
-    } = await import(
-      `https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-auth.js`
-    );
+    const authModule =
+      await import(
+        `https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-auth.js`
+      );
 
 
     /*
-      ÖNEMLİ:
+      BURADA getAuth KULLANIYORUZ.
 
-      IndexedDB yerine browserLocalPersistence
-      kullanıyoruz.
-
-      Böylece Google popup açıldığında
-      "Database is closing/hidden" sorununa
-      takılmıyoruz.
+      initializeAuth + popup kombinasyonunu
+      tamamen kaldırdık.
     */
 
     auth =
-      initializeAuth(
-        firebaseApp,
-        {
-          persistence:
-            browserLocalPersistence
-        }
+      authModule.getAuth(
+        firebaseApp
       );
+
+
+    await authModule.setPersistence(
+      auth,
+      authModule.browserLocalPersistence
+    );
 
 
     firebaseReady = true;
 
 
-    /* ---------------------------------------------
-       GİRİŞ BUTONU
-    --------------------------------------------- */
-
     createLoginButton(
-      GoogleAuthProvider,
-      signInWithPopup,
-      signOut
+      authModule
     );
 
 
-    /* ---------------------------------------------
-       KULLANICI DURUMU
-    --------------------------------------------- */
+    /*
+      REDIRECT SONUCUNU KONTROL ET
+    */
 
-    onAuthStateChanged(
+    try {
+
+      await authModule.getRedirectResult(
+        auth
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Redirect sonucu:",
+        error
+      );
+
+      if (
+        error &&
+        error.code
+      ) {
+
+        console.error(
+          "Firebase kodu:",
+          error.code
+        );
+
+      }
+
+    }
+
+
+    /*
+      OTURUM DURUMU
+    */
+
+    authModule.onAuthStateChanged(
       auth,
       async user => {
 
-        currentUser = user;
+        currentUser =
+          user;
 
         updateLoginButton();
 
@@ -859,15 +759,12 @@ async function initializeFirebase() {
           );
 
 
-          await loadCloudData();
+          await loadCloud();
 
         } else {
 
-          createStatus(
-            "Yerel mod aktif."
-          );
-
           render();
+
         }
 
       }
@@ -883,32 +780,30 @@ async function initializeFirebase() {
 
 
     createStatus(
-      "Firebase başlatılamadı. Yerel kayıt kullanılacak."
+      "Firebase bağlantısı kurulamadı."
     );
 
-
     render();
+
   }
+
 }
 
 
 /* =========================================================
-   FIRESTORE MODÜLÜ
+   FIRESTORE
 ========================================================= */
 
-async function getFirestoreModule() {
+async function firestoreModule() {
 
   return await import(
     `https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-firestore.js`
   );
+
 }
 
 
-/* =========================================================
-   FIRESTORE'DAN VERİ OKU
-========================================================= */
-
-async function loadCloudData() {
+async function loadCloud() {
 
   if (!currentUser) {
     render();
@@ -918,24 +813,22 @@ async function loadCloudData() {
 
   try {
 
-    const {
-      getFirestore,
-      doc,
-      getDoc
-    } = await getFirestoreModule();
+    const firestore =
+      await firestoreModule();
 
 
     if (!db) {
 
       db =
-        getFirestore(
+        firestore.getFirestore(
           firebaseApp
         );
+
     }
 
 
-    const ref =
-      doc(
+    const reference =
+      firestore.doc(
         db,
         "users",
         currentUser.uid,
@@ -945,7 +838,9 @@ async function loadCloudData() {
 
 
     const snapshot =
-      await getDoc(ref);
+      await firestore.getDoc(
+        reference
+      );
 
 
     if (snapshot.exists()) {
@@ -962,6 +857,7 @@ async function loadCloudData() {
 
         items =
           data.items;
+
       }
 
 
@@ -975,11 +871,13 @@ async function loadCloudData() {
           ...settings,
           ...data.settings
         };
+
       }
 
 
       saveLocal();
 
+      render();
 
       createStatus(
         "Bulut verileri yüklendi."
@@ -992,9 +890,6 @@ async function loadCloudData() {
     }
 
 
-    render();
-
-
   } catch (error) {
 
     console.error(
@@ -1004,58 +899,50 @@ async function loadCloudData() {
 
 
     alert(
-      "Firebase bağlantısı var fakat Firestore verisi okunamadı.\n\n" +
+      "Google girişi başarılı fakat Firestore okunamadı.\n\n" +
       error.message
     );
 
-
-    render();
   }
+
 }
 
 
-/* =========================================================
-   FIRESTORE'A VERİ KAYDET
-========================================================= */
-
 async function saveCloud() {
 
-  /* Önce bilgisayara kaydet */
   saveLocal();
 
   render();
 
 
-  /* Google girişi yoksa sadece yerel kayıt */
   if (
     !firebaseReady ||
     !currentUser
   ) {
 
     return;
+
   }
 
 
   try {
 
-    const {
-      getFirestore,
-      doc,
-      setDoc
-    } = await getFirestoreModule();
+    const firestore =
+      await firestoreModule();
 
 
     if (!db) {
 
       db =
-        getFirestore(
+        firestore.getFirestore(
           firebaseApp
         );
+
     }
 
 
-    const ref =
-      doc(
+    const reference =
+      firestore.doc(
         db,
         "users",
         currentUser.uid,
@@ -1064,8 +951,8 @@ async function saveCloud() {
       );
 
 
-    await setDoc(
-      ref,
+    await firestore.setDoc(
+      reference,
       {
         items: items,
         settings: settings,
@@ -1086,7 +973,7 @@ async function saveCloud() {
   } catch (error) {
 
     console.error(
-      "Firestore kayıt hatası:",
+      "Firestore yazma hatası:",
       error
     );
 
@@ -1095,7 +982,9 @@ async function saveCloud() {
       "Buluta kayıt yapılamadı.\n\n" +
       error.message
     );
+
   }
+
 }
 
 
@@ -1103,17 +992,12 @@ async function saveCloud() {
    GOOGLE GİRİŞ BUTONU
 ========================================================= */
 
-function createLoginButton(
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut
-) {
+function createLoginButton(authModule) {
 
   const header =
     document.querySelector(
       "header"
     );
-
 
   if (!header) {
     return;
@@ -1125,18 +1009,14 @@ function createLoginButton(
       ".header-actions"
     );
 
-
   if (!actions) {
     return;
   }
 
 
   if (
-    document.getElementById(
-      "firebaseLogin"
-    )
+    $("firebaseLogin")
   ) {
-
     return;
   }
 
@@ -1164,28 +1044,14 @@ function createLoginButton(
 
       try {
 
-        /* ---------------------------------
-           ÇIKIŞ
-        --------------------------------- */
+        /*
+          POPUP YOK.
 
-        if (currentUser) {
-
-          await signOut(auth);
-
-          createStatus(
-            "Çıkış yapıldı."
-          );
-
-          return;
-        }
-
-
-        /* ---------------------------------
-           GOOGLE GİRİŞ
-        --------------------------------- */
+          REDIRECT KULLANIYORUZ.
+        */
 
         const provider =
-          new GoogleAuthProvider();
+          new authModule.GoogleAuthProvider();
 
 
         provider.setCustomParameters({
@@ -1193,7 +1059,7 @@ function createLoginButton(
         });
 
 
-        await signInWithPopup(
+        await authModule.signInWithRedirect(
           auth,
           provider
         );
@@ -1209,27 +1075,31 @@ function createLoginButton(
 
         alert(
           "Giriş işlemi başarısız:\n\n" +
+          error.code +
+          "\n\n" +
           error.message
         );
+
       }
+
     };
 
 
   actions.appendChild(
     button
   );
+
 }
 
 
 /* =========================================================
-   GİRİŞ BUTONU DURUMU
+   GİRİŞ BUTONU
 ========================================================= */
 
 function updateLoginButton() {
 
   const button =
     $("firebaseLogin");
-
 
   if (!button) {
     return;
@@ -1238,20 +1108,56 @@ function updateLoginButton() {
 
   if (currentUser) {
 
-    const name =
-      currentUser.displayName ||
-      currentUser.email ||
-      "Google";
-
-
     button.textContent =
-      "Çıkış · " + name;
+      "Çıkış · " +
+      (
+        currentUser.displayName ||
+        currentUser.email ||
+        "Google"
+      );
+
+    button.onclick =
+      async () => {
+
+        try {
+
+          const authModule =
+            await import(
+              `https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-auth.js`
+            );
+
+
+          await authModule.signOut(
+            auth
+          );
+
+
+          currentUser =
+            null;
+
+          updateLoginButton();
+
+          render();
+
+
+        } catch (error) {
+
+          alert(
+            "Çıkış yapılamadı:\n\n" +
+            error.message
+          );
+
+        }
+
+      };
 
   } else {
 
     button.textContent =
       "Google ile Giriş";
+
   }
+
 }
 
 
@@ -1294,6 +1200,7 @@ function createStatus(text) {
     document.body.appendChild(
       box
     );
+
   }
 
 
@@ -1317,17 +1224,19 @@ function createStatus(text) {
       },
       3000
     );
+
 }
 
 
 /* =========================================================
-   FORM OLAYLARI
+   FORM
 ========================================================= */
 
 if ($("type")) {
 
   $("type").onchange =
     sync;
+
 }
 
 
@@ -1335,6 +1244,7 @@ if ($("payment")) {
 
   $("payment").onchange =
     sync;
+
 }
 
 
@@ -1343,19 +1253,16 @@ if ($("installment")) {
   $("installment").onchange =
     () => {
 
-      $("installmentFields")
-        .hidden =
+      $("installmentFields").hidden =
         !$("installment").checked;
 
 
-      if (
-        $("amount") &&
-        $("amount").value
-      ) {
-
+      if ($("amount")) {
         $("amount").oninput();
       }
+
     };
+
 }
 
 
@@ -1376,6 +1283,7 @@ if ($("amount")) {
           "";
 
         return;
+
       }
 
 
@@ -1397,7 +1305,9 @@ if ($("amount")) {
               amount / count
             )}`
           : "";
+
     };
+
 }
 
 
@@ -1409,7 +1319,9 @@ if ($("installmentCount")) {
       if ($("amount")) {
         $("amount").oninput();
       }
+
     };
+
 }
 
 
@@ -1453,10 +1365,6 @@ if ($("form")) {
           .trim();
 
 
-      /* ---------------------------------
-         KONTROLLER
-      --------------------------------- */
-
       if (!description) {
 
         alert(
@@ -1464,6 +1372,7 @@ if ($("form")) {
         );
 
         return;
+
       }
 
 
@@ -1477,6 +1386,7 @@ if ($("form")) {
         );
 
         return;
+
       }
 
 
@@ -1493,12 +1403,12 @@ if ($("form")) {
         );
 
         return;
+
       }
 
 
       if (
-        payment ===
-        "Kredi Kartı" &&
+        payment === "Kredi Kartı" &&
         !card
       ) {
 
@@ -1507,37 +1417,28 @@ if ($("form")) {
         );
 
         return;
+
       }
 
 
-      /* ---------------------------------
-         TAKSİT
-      --------------------------------- */
-
       const count =
-        payment ===
-        "Kredi Kartı" &&
+        payment === "Kredi Kartı" &&
         $("installment").checked
           ? Number(
-              $("installmentCount")
-                .value
+              $("installmentCount").value
             ) || 1
           : 1;
 
 
-      /* ---------------------------------
-         KAYIT
-      --------------------------------- */
-
       items.push({
 
-        id: Date.now(),
+        id:
+          Date.now(),
 
         date:
           $("date").value,
 
         description:
-
           description,
 
         type:
@@ -1550,8 +1451,7 @@ if ($("form")) {
           card,
 
         category:
-          type ===
-          "Kasa Transferi"
+          type === "Kasa Transferi"
             ? "Kasa Transferi"
             : $("category").value,
 
@@ -1560,44 +1460,35 @@ if ($("form")) {
 
         installments:
           count
+
       });
 
 
-      /* ---------------------------------
-         FORMU TEMİZLE
-      --------------------------------- */
+      $("description").value =
+        "";
 
-      $("description")
-        .value = "";
+      $("amount").value =
+        "";
 
+      $("installment").checked =
+        false;
 
-      $("amount")
-        .value = "";
+      $("installmentFields").hidden =
+        true;
 
+      $("installmentPreview").textContent =
+        "";
 
-      $("installment")
-        .checked = false;
-
-
-      $("installmentFields")
-        .hidden = true;
-
-
-      $("installmentPreview")
-        .textContent = "";
-
-
-      /* ---------------------------------
-         FIREBASE + LOCAL
-      --------------------------------- */
 
       await saveCloud();
+
     };
+
 }
 
 
 /* =========================================================
-   SEÇİLİ İŞLEMLERİ SİL
+   SEÇİLİ SİL
 ========================================================= */
 
 if ($("clearBtn")) {
@@ -1607,15 +1498,14 @@ if ($("clearBtn")) {
 
       const ids =
         [
-          ...document
-            .querySelectorAll(
-              ".sel:checked"
-            )
+          ...document.querySelectorAll(
+            ".sel:checked"
+          )
         ]
         .map(
-          checkbox =>
+          x =>
             Number(
-              checkbox.dataset.id
+              x.dataset.id
             )
         );
 
@@ -1627,6 +1517,7 @@ if ($("clearBtn")) {
         );
 
         return;
+
       }
 
 
@@ -1637,25 +1528,28 @@ if ($("clearBtn")) {
       ) {
 
         return;
+
       }
 
 
       items =
         items.filter(
-          item =>
+          x =>
             !ids.includes(
-              Number(item.id)
+              Number(x.id)
             )
         );
 
 
       await saveCloud();
+
     };
+
 }
 
 
 /* =========================================================
-   TÜM KAYITLARI SİL
+   TÜMÜNÜ SİL
 ========================================================= */
 
 if ($("clearAllBtn")) {
@@ -1672,6 +1566,7 @@ if ($("clearAllBtn")) {
       ) {
 
         return;
+
       }
 
 
@@ -1679,7 +1574,9 @@ if ($("clearAllBtn")) {
 
 
       await saveCloud();
+
     };
+
 }
 
 
@@ -1734,7 +1631,9 @@ if ($("exportBtn")) {
       URL.revokeObjectURL(
         url
       );
+
     };
+
 }
 
 
@@ -1745,8 +1644,6 @@ if ($("exportBtn")) {
 loadLocal();
 
 
-/* Tarih */
-
 if ($("date")) {
 
   $("date").value =
@@ -1755,10 +1652,9 @@ if ($("date")) {
     String(
       new Date().getDate()
     ).padStart(2, "0");
+
 }
 
-
-/* Kartlar */
 
 if ($("card")) {
 
@@ -1773,16 +1669,12 @@ if ($("card")) {
           </option>`
       )
       .join("");
+
 }
 
-
-/* İlk görünüm */
 
 sync();
 
 render();
 
-
-/* Firebase */
-
-initializeFirebase();
+initFirebase();
