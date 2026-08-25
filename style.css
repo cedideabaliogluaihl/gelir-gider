@@ -8,5 +8,4 @@
 .editBtn{border:1px solid #b9c5d0;background:#fff;border-radius:7px;padding:6px 10px;cursor:pointer;font-size:12px}
 .edit-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;padding:20px;z-index:1000}
 .edit-box{background:#fff;width:min(520px,100%);border-radius:14px;padding:20px;box-shadow:0 15px 50px rgba(0,0,0,.2)}
-.edit-box h2{margin:0 0 16px}.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.edit-grid label{display:grid;gap:5px;font-size:12px;color:#68737d}.edit-grid input,.edit-grid select{width:100%}.edit-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
-@media(max-width:650px){.edit-grid{grid-template-columns:1fr}}
+.edit-box h2{margin:0 0 16px}.edit-box label{display:grid;gap:5px;margin:10px 0;font-size:12px}.edit-box input,.edit-box select{width:100%;box-sizing:border-box}.edit-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}

@@ -1,8 +1,8 @@
-# Gelir-Gider V1.7
+# Gelir-Gider V1.8
 
-- Ana ekran yalnızca güncel ayı gösterir.
-- Ana ekran ve Raporlar kayıtlarında **Düzenle** butonu vardır.
-- Düzenle ile tarih, açıklama, tutar ve kategori değiştirilebilir.
-- Eski kategorisiz kayıtlar silinmez; doğrudan Düzenle ile kategori atanabilir.
-- Raporlar sayfasında Kategorisiz Eski Kayıtlar filtresi de vardır.
-- Yeni Gelir/Gider kayıtlarında kategori zorunludur.
+Raporlar sayfası yeniden düzenlendi.
+- Her rapor kaydında çalışan Düzenle butonu.
+- Event delegation ile butonlar render sonrası da çalışır.
+- Düzenle: tarih, açıklama, tutar, kategori.
+- Eski kategorisiz kayıtlar doğrudan düzenlenebilir.
+- Ana ekran kayıtları korunur.

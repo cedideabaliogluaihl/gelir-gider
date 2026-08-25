@@ -1,170 +1,213 @@
-<!doctype html><html lang="tr"><head><meta charset="utf-8">
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1f4e78"><link rel="stylesheet" href="style.css"><title>Raporlar - Gelir Gider</title></head>
-<body><header><div><h1>Raporlar <small style="font-size:11px;opacity:.7">V1.7</small></h1><div class="sub">Geçmiş ayları ve kategorileri incele</div></div><a class="ghost link-btn" href="index.html">← Ana Sayfa</a></header><main>
-<section class="panel"><div class="panel-head"><h2>Filtre</h2></div>
-<div class="report-filter">
-<label>Tür<select id="rtype"><option value="Gelir">Gelir</option><option value="Gider">Gider</option></select></label>
-<label>Kategori<select id="rcat">
-<option value="all">Tüm Kategoriler</option>
-<option value="uncategorized">Kategorisiz Eski Kayıtlar</option>
-</select></label>
-<label>Dönem<select id="period"><option value="3">Son 3 Ay</option><option value="7" selected>Son 7 Ay</option><option value="12">Son 12 Ay</option><option value="all">Tüm Dönem</option></select></label>
-</div></section>
-<section class="summary">
-<div class="card income"><span>Seçilen Toplam</span><strong id="selectedTotal">0 ₺</strong></div>
-<div class="card expense"><span>Aylık Ortalama</span><strong id="average">0 ₺</strong></div>
-<div class="card net"><span>En Yüksek Ay</span><strong id="maxMonth">-</strong></div>
-<div class="card transfer"><span>İşlem Sayısı</span><strong id="count">0</strong></div>
+<meta name="theme-color" content="#1f4e78">
+<link rel="stylesheet" href="style.css">
+<title>Raporlar V1.8</title>
+</head>
+<body>
+<header>
+  <div><h1>Raporlar <small style="font-size:11px;opacity:.7">V1.8</small></h1><div class="sub">Geçmiş ayları ve kategorileri incele</div></div>
+  <a class="ghost link-btn" href="index.html">← Ana Sayfa</a>
+</header>
+<main>
+<section class="panel">
+ <div class="panel-head"><h2>Filtre</h2></div>
+ <div class="report-filter">
+  <label>Tür<select id="rtype"><option value="Gelir">Gelir</option><option value="Gider">Gider</option></select></label>
+  <label>Kategori<select id="rcat"><option value="all">Tüm Kategoriler</option></select></label>
+  <label>Dönem<select id="period"><option value="3">Son 3 Ay</option><option value="7" selected>Son 7 Ay</option><option value="12">Son 12 Ay</option><option value="all">Tüm Dönem</option></select></label>
+ </div>
+ <div id="filterInfo" class="filter-info"></div>
 </section>
-<section class="panel"><div class="panel-head"><div><h2>Aylık Dağılım</h2><span id="reportTitle" class="muted"></span></div></div>
-<div class="table-wrap"><table><thead><tr><th>Ay</th><th>Tutar</th><th>İşlem Sayısı</th></tr></thead><tbody id="reportList"></tbody></table></div></section>
-<section class="panel"><div class="panel-head"><h2>Seçilen Kayıtlar</h2></div>
-<div class="table-wrap"><table><thead><tr><th>Tarih</th><th>Açıklama</th><th>Kategori</th><th>Tutar</th><th>İşlem</th></tr></thead><tbody id="detailList"></tbody></table></div></section>
+
+<section class="summary">
+ <div class="card income"><span>Seçilen Toplam</span><strong id="selectedTotal">0 ₺</strong></div>
+ <div class="card expense"><span>Aylık Ortalama</span><strong id="average">0 ₺</strong></div>
+ <div class="card net"><span>En Yüksek Ay</span><strong id="maxMonth">-</strong></div>
+ <div class="card transfer"><span>İşlem Sayısı</span><strong id="count">0</strong></div>
+</section>
 
 <section class="panel">
-  <div class="panel-head">
-    <div><h2>Kategorisiz Eski Kayıtlar</h2><span class="muted">Eski verilerin silinmez; burada kategori atayabilirsin.</span></div>
-  </div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>Tarih</th><th>Açıklama</th><th>Tür</th><th>Tutar</th><th>Kategori</th><th></th></tr></thead>
-      <tbody id="uncatList"></tbody>
-    </table>
-  </div>
+ <div class="panel-head"><div><h2>Aylık Dağılım</h2><span id="reportTitle" class="muted"></span></div></div>
+ <div class="table-wrap"><table>
+  <thead><tr><th>Ay</th><th>Tutar</th><th>İşlem Sayısı</th></tr></thead>
+  <tbody id="reportList"></tbody>
+ </table></div>
 </section>
 
-<p class="note">Bu sayfa geçmiş kayıtları gösterir. Ana ekranda yalnızca güncel ay gösterilse de eski kayıtlar burada kalır.</p>
+<section class="panel">
+ <div class="panel-head"><h2>İşlemler</h2></div>
+ <div class="table-wrap"><table>
+  <thead><tr><th>Tarih</th><th>Açıklama</th><th>Kategori</th><th>Tutar</th><th>İşlem</th></tr></thead>
+  <tbody id="detailList"></tbody>
+ </table></div>
+</section>
+
+<section class="panel">
+ <div class="panel-head"><div><h2>Kategorisiz Eski Kayıtlar</h2><span class="muted">Eski kayıtları doğrudan Düzenle ile kategorilendir.</span></div></div>
+ <div class="table-wrap"><table>
+  <thead><tr><th>Tarih</th><th>Açıklama</th><th>Tür</th><th>Tutar</th><th>Kategori</th><th>İşlem</th></tr></thead>
+  <tbody id="uncatList"></tbody>
+ </table></div>
+</section>
+
+<p class="note">Eski kayıtların silinmez. Raporlardaki <b>Düzenle</b> butonuyla kategori, açıklama, tarih veya tutarı değiştirebilirsin.</p>
 </main>
+
 <script>
-const KEY="gelirGiderV4",SET="gelirGiderSettingsV1";
-let items=[],settings={incomeCategories:["Maaş","Ek Ders","Diğer Gelir"],expenseCategories:["Kira","Market","Fatura","Yakıt","Nakit","Diğer Gider"]};
-const $=id=>document.getElementById(id),money=n=>new Intl.NumberFormat("tr-TR",{style:"currency",currency:"TRY",maximumFractionDigits:2}).format(n);
+const KEY="gelirGiderV4", SET="gelirGiderSettingsV1";
+let items=[], settings={
+ incomeCategories:["Maaş","Ek Ders","Diğer Gelir"],
+ expenseCategories:["Kira","Market","Fatura","Yakıt","Nakit","Diğer Gider"]
+};
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat("tr-TR",{style:"currency",currency:"TRY",maximumFractionDigits:2}).format(n);
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 function load(){
-  try{items=JSON.parse(localStorage.getItem(KEY)||"[]");settings=JSON.parse(localStorage.getItem(SET)||JSON.stringify(settings))}catch{}
-  if(!Array.isArray(items))items=[];
-  if(!Array.isArray(settings.incomeCategories)||!settings.incomeCategories.length)settings.incomeCategories=["Maaş","Ek Ders","Diğer Gelir"];
-  if(!Array.isArray(settings.expenseCategories)||!settings.expenseCategories.length)settings.expenseCategories=["Kira","Market","Fatura","Yakıt","Nakit","Diğer Gider"];
+ try{items=JSON.parse(localStorage.getItem(KEY)||"[]");settings=JSON.parse(localStorage.getItem(SET)||JSON.stringify(settings))}catch{}
+ if(!Array.isArray(items))items=[];
+ if(!Array.isArray(settings.incomeCategories)||!settings.incomeCategories.length)settings.incomeCategories=["Maaş","Ek Ders","Diğer Gelir"];
+ if(!Array.isArray(settings.expenseCategories)||!settings.expenseCategories.length)settings.expenseCategories=["Kira","Market","Fatura","Yakıt","Nakit","Diğer Gider"];
 }
-function saveItems(){localStorage.setItem(KEY,JSON.stringify(items))}
+function save(){localStorage.setItem(KEY,JSON.stringify(items))}
 function isCard(x){return x.type==="Gider"&&x.payment==="Kredi Kartı"&&x.card?.startsWith("c")}
-function n(x){return Math.max(1,Number(x.installments)||1)}
+function inst(x){return Math.max(1,Number(x.installments)||1)}
 function ym(d){return String(d).slice(0,7)}
-function due(x,m){
-  if(!isCard(x))return 0;
-  let s=ym(x.date),d=(+m.slice(0,4)-+s.slice(0,4))*12+(+m.slice(5)-+s.slice(5));
-  return d>=0&&d<n(x)?x.amount/n(x):0
+function addMonths(z,n){
+ let [y,m]=z.split("-").map(Number); m+=n; y+=Math.floor((m-1)/12); m=(m-1)%12+1;
+ return y+"-"+String(m).padStart(2,"0");
 }
-function addMonths(z,nm){
-  let[y,m]=z.split("-").map(Number);m+=nm;y+=Math.floor((m-1)/12);m=(m-1)%12+1;
-  return y+"-"+String(m).padStart(2,"0")
+function due(x,m){
+ if(!isCard(x))return 0;
+ const s=ym(x.date),d=(+m.slice(0,4)-+s.slice(0,4))*12+(+m.slice(5)-+s.slice(5));
+ return d>=0&&d<inst(x)?x.amount/inst(x):0;
 }
 function monthLabel(m){return new Date(m+"-01T00:00:00").toLocaleDateString("tr-TR",{month:"long",year:"numeric"})}
-function populate(){
-  let type=$("rtype").value,arr=type==="Gelir"?settings.incomeCategories:settings.expenseCategories;
-  $("rcat").innerHTML='<option value="all">Tüm Kategoriler</option>'+arr.map(x=>`<option>${esc(x)}</option>`).join("");
+
+function populateCategories(){
+ const type=$("rtype").value;
+ const arr=type==="Gelir"?settings.incomeCategories:settings.expenseCategories;
+ $("rcat").innerHTML='<option value="all">Tüm Kategoriler</option><option value="uncategorized">Kategorisiz Eski Kayıtlar</option>'+
+   arr.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
 }
-function monthlyValue(x,m){
-  if(x.type==="Gider"&&isCard(x))return due(x,m);
-  return (x.type==="Gider"||x.type==="Gelir")&&String(x.date).startsWith(m)?Number(x.amount)||0:0;
+
+function valueForMonth(x,m){
+ if(x.type==="Gider"&&isCard(x))return due(x,m);
+ if(x.type==="Gelir"||x.type==="Gider")return String(x.date).startsWith(m)?Number(x.amount)||0:0;
+ return 0;
+}
+
+function render(){
+ const type=$("rtype").value,cat=$("rcat").value,period=$("period").value,now=new Date().toISOString().slice(0,7);
+ const eligible=x=>x.type===type && (cat==="all" ? true : cat==="uncategorized" ? !x.category : x.category===cat);
+
+ let months=[];
+ if(period==="all"){
+   items.filter(x=>x.type===type).forEach(x=>{const m=ym(x.date);if(!months.includes(m))months.push(m)});
+   items.filter(x=>type==="Gider"&&isCard(x)).forEach(x=>{for(let i=0;i<inst(x);i++){const m=addMonths(ym(x.date),i);if(!months.includes(m))months.push(m)}});
+   months.sort().reverse();
+ }else{
+   for(let i=0;i<Number(period);i++)months.push(addMonths(now,-i));
+ }
+
+ let total=0,count=0,monthRows=[],details=[];
+ for(const m of months){
+   let val=0,cnt=0;
+   items.filter(eligible).forEach(x=>{
+     const v=valueForMonth(x,m);
+     if(v>0){
+       val+=v;cnt++;
+       if(String(x.date).startsWith(m)||isCard(x))details.push({x,v});
+     }
+   });
+   if(val>0||period==="all")monthRows.push({m,val,cnt});
+   total+=val;count+=cnt;
+ }
+
+ $("selectedTotal").textContent=money(total);
+ $("average").textContent=money(monthRows.length?total/monthRows.length:0);
+ const max=monthRows.reduce((a,b)=>b.val>a.val?b:a,{m:"-",val:0});
+ $("maxMonth").textContent=max.val?monthLabel(max.m):"-";
+ $("count").textContent=count;
+ $("reportTitle").textContent=`${type}${cat==="uncategorized"?" · Kategorisiz":cat!=="all"?" · "+cat:""} · ${period==="all"?"Tüm Dönem":"Son "+period+" Ay"}`;
+ $("reportList").innerHTML=monthRows.map(r=>`<tr><td>${monthLabel(r.m)}</td><td class="amount">${money(r.val)}</td><td>${r.cnt}</td></tr>`).join("")||'<tr><td colspan="3" class="empty">Kayıt bulunamadı.</td></tr>';
+
+ const seen=new Set();
+ details.sort((a,b)=>b.x.date.localeCompare(a.x.date));
+ const rows=[];
+ details.forEach(d=>{const k=String(d.x.id)+"-"+String(d.v);if(!seen.has(k)){seen.add(k);rows.push(d)}});
+ $("detailList").innerHTML=rows.map(d=>`
+ <tr>
+  <td>${new Date(d.x.date+"T00:00:00").toLocaleDateString("tr-TR")}</td>
+  <td>${esc(d.x.description)}</td>
+  <td>${esc(d.x.category||"Kategorisiz")}</td>
+  <td class="amount">${money(d.v)}</td>
+  <td><button type="button" class="editBtn" data-id="${d.x.id}">Düzenle</button></td>
+ </tr>`).join("")||'<tr><td colspan="5" class="empty">Kayıt bulunamadı.</td></tr>';
+
+ const missing=items.filter(x=>(x.type==="Gelir"||x.type==="Gider")&&x.type===type&&!x.category);
+ $("filterInfo").textContent=missing.length
+   ? `${missing.length} eski ${type.toLowerCase()} kaydında kategori eksik. Düzenle butonundan kategori verebilirsin.`
+   : "Kayıtları Düzenle butonundan değiştirebilirsin.";
+
+ renderUncategorized();
+}
+
+function renderUncategorized(){
+ const type=$("rtype").value;
+ const rows=items.filter(x=>(x.type==="Gelir"||x.type==="Gider")&&x.type===type&&!x.category);
+ $("uncatList").innerHTML=rows.length?rows.sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`
+ <tr>
+  <td>${new Date(x.date+"T00:00:00").toLocaleDateString("tr-TR")}</td>
+  <td>${esc(x.description)}</td>
+  <td>${esc(x.type)}</td>
+  <td class="amount">${money(x.amount)}</td>
+  <td>Kategorisiz</td>
+  <td><button type="button" class="editBtn" data-id="${x.id}">Düzenle</button></td>
+ </tr>`).join(""):'<tr><td colspan="6" class="empty">Bu türde kategorisiz eski kayıt yok.</td></tr>';
 }
 
 function openEdit(id){
- const x=items.find(v=>v.id===id);
- if(!x)return;
+ const x=items.find(v=>Number(v.id)===Number(id));
+ if(!x){alert("Kayıt bulunamadı.");return;}
  const arr=x.type==="Gelir"?settings.incomeCategories:settings.expenseCategories;
  const modal=document.createElement("div");
  modal.className="edit-modal";
  modal.innerHTML=`<div class="edit-box">
-   <h2>İşlemi Düzenle</h2>
-   <label>Tarih<input id="edDate" type="date" value="${esc(x.date)}"></label>
-   <label>Açıklama<input id="edDesc" value="${esc(x.description)}"></label>
-   <label>Tutar<input id="edAmount" type="number" step="0.01" min="0.01" value="${Number(x.amount)}"></label>
-   <label>Kategori<select id="edCat"><option value="">Kategorisiz</option>${arr.map(c=>`<option value="${esc(c)}" ${x.category===c?"selected":""}>${esc(c)}</option>`).join("")}</select></label>
-   <div class="edit-actions"><button id="edCancel" class="ghost">Vazgeç</button><button id="edSave" class="primary">Kaydet</button></div>
+  <h2>İşlemi Düzenle</h2>
+  <label>Tarih<input id="edDate" type="date" value="${esc(x.date)}"></label>
+  <label>Açıklama<input id="edDesc" type="text" value="${esc(x.description)}"></label>
+  <label>Tutar<input id="edAmount" type="number" step="0.01" min="0.01" value="${Number(x.amount)}"></label>
+  <label>Kategori<select id="edCat"><option value="">Kategorisiz</option>${arr.map(c=>`<option value="${esc(c)}" ${x.category===c?"selected":""}>${esc(c)}</option>`).join("")}</select></label>
+  <div class="edit-actions"><button type="button" id="edCancel" class="ghost">Vazgeç</button><button type="button" id="edSave" class="primary">Kaydet</button></div>
  </div>`;
  document.body.appendChild(modal);
  modal.querySelector("#edCancel").onclick=()=>modal.remove();
- modal.onclick=e=>{if(e.target===modal)modal.remove()};
+ modal.addEventListener("click",e=>{if(e.target===modal)modal.remove()});
  modal.querySelector("#edSave").onclick=()=>{
+   const date=modal.querySelector("#edDate").value;
    const desc=modal.querySelector("#edDesc").value.trim();
    const amount=Number(modal.querySelector("#edAmount").value);
-   const date=modal.querySelector("#edDate").value;
-   if(!desc)return alert("Açıklama gir.");
-   if(!date)return alert("Tarih seç.");
-   if(!amount||amount<=0)return alert("Geçerli tutar gir.");
-   x.date=date;x.description=desc;x.amount=amount;x.category=modal.querySelector("#edCat").value;
+   const category=modal.querySelector("#edCat").value;
+   if(!date||!desc||!amount||amount<=0){alert("Tarih, açıklama ve geçerli tutar gerekli.");return;}
+   x.date=date;x.description=desc;x.amount=amount;x.category=category;
    save();modal.remove();render();
  };
 }
-function bindEditButtons(){bindEditButtons();}
-function render(){
-  const type=$("rtype").value,cat=$("rcat").value,period=$("period").value,now=new Date().toISOString().slice(0,7);
-  let months=[];
-  if(period==="all"){
-    items.filter(x=>x.type===type).forEach(x=>{let m=ym(x.date);if(!months.includes(m))months.push(m)});
-    items.filter(x=>type==="Gider"&&isCard(x)).forEach(x=>{
-      for(let i=0;i<n(x);i++){let m=addMonths(ym(x.date),i);if(!months.includes(m))months.push(m)}
-    });
-    months.sort().reverse();
-  }else{
-    for(let i=0;i<Number(period);i++)months.push(addMonths(now,-i));
-  }
 
-  const eligible=x=>x.type===type&&(cat==="all"||x.category===cat);
-  let monthRows=[],total=0,count=0,details=[];
-  for(const m of months){
-    let val=0,cnt=0;
-    items.filter(eligible).forEach(x=>{
-      let v=monthlyValue(x,m);
-      if(v>0){
-        val+=v;cnt++;
-        if(x.date.startsWith(m)||isCard(x))details.push({x,v});
-      }
-    });
-    if(val>0||period==="all")monthRows.push({m,val,cnt});
-    total+=val;count+=cnt;
-  }
+// Event delegation: buttons are recreated by render(), so binding once is reliable.
+document.addEventListener("click",e=>{
+ const btn=e.target.closest(".editBtn");
+ if(btn){e.preventDefault();openEdit(btn.dataset.id);}
+});
 
-  $("selectedTotal").textContent=money(total);
-  $("average").textContent=money(monthRows.length?total/monthRows.length:0);
-  const max=monthRows.reduce((a,b)=>b.val>a.val?b:a,{m:"-",val:0});
-  $("maxMonth").textContent=max.val?monthLabel(max.m):"-";
-  $("count").textContent=count;
-  $("reportTitle").textContent=`${type}${cat!=="all"?" · "+cat:""} · ${period==="all"?"Tüm Dönem":"Son "+period+" Ay"}`;
-  $("reportList").innerHTML=monthRows.map(r=>`<tr><td>${monthLabel(r.m)}</td><td class="amount">${money(r.val)}</td><td>${r.cnt}</td></tr>`).join("")||'<tr><td colspan="3" class="empty">Kayıt bulunamadı.</td></tr>';
-
-  const seen=new Set(),rows=[];
-  details.sort((a,b)=>b.x.date.localeCompare(a.x.date));
-  details.forEach(d=>{const key=d.x.id+"-"+d.v;if(!seen.has(key)){seen.add(key);rows.push(d)}});
-  $("detailList").innerHTML=rows.map(d=>`<tr><td>${new Date(d.x.date+"T00:00:00").toLocaleDateString("tr-TR")}</td><td>${esc(d.x.description)}</td><td>${esc(d.x.category||"Kategorisiz")}</td><td class="amount">${money(d.v)}</td><td><button class="editBtn" data-id="${d.x.id}">Düzenle</button></td></tr>`).join("")||'<tr><td colspan="4" class="empty">Kayıt bulunamadı.</td></tr>';
- bindEditButtons();  renderUncategorized();
-}
-function renderUncategorized(){
-  const rows=items.filter(x=>(x.type==="Gelir"||x.type==="Gider")&&!x.category);
-  $("uncatList").innerHTML=rows.length?rows.sort((a,b)=>b.date.localeCompare(a.date)).map(x=>{
-    const arr=x.type==="Gelir"?settings.incomeCategories:settings.expenseCategories;
-    return `<tr>
-      <td>${new Date(x.date+"T00:00:00").toLocaleDateString("tr-TR")}</td>
-      <td>${esc(x.description)}</td>
-      <td>${esc(x.type)}</td>
-      <td class="amount">${money(x.amount)}</td>
-      <td><select class="assignCat" data-id="${x.id}"><option value="">Seç...</option>${arr.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("")}</select></td>
-      <td><button class="primary saveCat" data-id="${x.id}">Kaydet</button></td>
-    </tr>`;
-  }).join(""):'<tr><td colspan="6" class="empty">Kategorisiz eski kayıt yok.</td></tr>';
-
-  document.querySelectorAll(".saveCat").forEach(btn=>btn.onclick=()=>{
-    const id=Number(btn.dataset.id),sel=document.querySelector(`.assignCat[data-id="${id}"]`);
-    if(!sel.value)return alert("Önce kategori seç.");
-    const item=items.find(x=>x.id===id);
-    if(item){item.category=sel.value;saveItems();render();}
-  });
-}
-load();populate();
-$("rtype").onchange=()=>{populate();render()};
+load();populateCategories();
+$("rtype").onchange=()=>{populateCategories();render()};
 $("rcat").onchange=render;
 $("period").onchange=render;
 render();
-</script></body></html>
+</script>
+</body></html>
