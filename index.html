@@ -12,6 +12,7 @@
 <header>
   <div><h1>Gelir · Gider</h1><div class="sub">Kişisel para takibi</div></div>
   <div class="header-actions">
+    <a class="ghost link-btn" href="reports.html">Raporlar</a>
     <a class="ghost link-btn" href="settings.html">Ayarlar</a>
     <button id="exportBtn" class="ghost">Yedekle</button>
   </div>
@@ -64,7 +65,7 @@
 </section>
 
 <section class="panel">
-<div class="panel-head"><h2>Aylık Özet</h2><select id="monthFilter"><option value="all">Tüm Aylar</option></select></div>
+<div class="panel-head"><h2>Bu Ayın Özeti</h2><span id="currentMonthLabel" class="muted"></span></div>
 <div class="month-grid">
 <div><span>Gelir</span><strong id="monthIncome">0 ₺</strong></div><div><span>Gider</span><strong id="monthExpense">0 ₺</strong></div>
 <div><span>Net</span><strong id="monthNet">0 ₺</strong></div><div><span>Kasaya Aktarılan</span><strong id="monthTransfer">0 ₺</strong></div>
@@ -72,12 +73,12 @@
 </section>
 
 <section class="panel">
-<div class="panel-head"><h2>İşlemler</h2><div class="actions"><button id="clearBtn" class="danger-outline">Seçiliyi Sil</button><button id="clearAllBtn" class="danger-outline">Tümünü Temizle</button></div></div>
+<div class="panel-head"><h2 id="transactionsTitle">Bu Ayın İşlemleri</h2><div class="actions"><button id="clearBtn" class="danger-outline">Seçiliyi Sil</button><button id="clearAllBtn" class="danger-outline">Tümünü Temizle</button></div></div>
 <div class="table-wrap"><table><thead><tr><th></th><th>Tarih</th><th>Açıklama</th><th>Kategori</th><th>Tür</th><th>Ödeme</th><th>Kart</th><th>Taksit</th><th>Tutar</th></tr></thead>
 <tbody id="list"></tbody></table><div id="empty" class="empty">Henüz işlem yok.</div></div>
 </section>
-<p class="note">Taksitli alışverişte girilen tutar toplam alışveriş tutarıdır. Gider hesabına her ay yalnızca o ayın taksiti girer. Kartın toplam yükü ayrıca takip edilir.</p>
+<p class="note">Ana ekran yalnızca güncel ayı gösterir. Eski kayıtlar silinmez; geçmiş ayları ve kategori toplamlarını <a href="reports.html">Raporlar</a> bölümünden görebilirsin.</p>
 </main>
-<script src="app.js?v=12"></script>
+<script src="app.js?v=13"></script>
 </body>
 </html>
