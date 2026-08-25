@@ -20,7 +20,7 @@
 <section class="panel"><div class="panel-head"><div><h2>Aylık Dağılım</h2><span id="reportTitle" class="muted"></span></div></div>
 <div class="table-wrap"><table><thead><tr><th>Ay</th><th>Tutar</th><th>İşlem Sayısı</th></tr></thead><tbody id="reportList"></tbody></table></div></section>
 <section class="panel"><div class="panel-head"><h2>Seçilen Kayıtlar</h2></div>
-<div class="table-wrap"><table><thead><tr><th>Tarih</th><th>Açıklama</th><th>Kategori</th><th>Tutar</th></tr></thead><tbody id="detailList"></tbody></table></div></section>
+<div class="table-wrap"><table><thead><tr><th>Tarih</th><th>Açıklama</th><th>Kategori</th><th>Tutar</th><th>İşlem</th></tr></thead><tbody id="detailList"></tbody></table></div></section>
 
 <section class="panel">
   <div class="panel-head">
@@ -69,6 +69,35 @@ function monthlyValue(x,m){
   if(x.type==="Gider"&&isCard(x))return due(x,m);
   return (x.type==="Gider"||x.type==="Gelir")&&String(x.date).startsWith(m)?Number(x.amount)||0:0;
 }
+
+function openEdit(id){
+ const x=items.find(v=>v.id===id);
+ if(!x)return;
+ const arr=x.type==="Gelir"?settings.incomeCategories:settings.expenseCategories;
+ const modal=document.createElement("div");
+ modal.className="edit-modal";
+ modal.innerHTML=`<div class="edit-box">
+   <h2>İşlemi Düzenle</h2>
+   <label>Tarih<input id="edDate" type="date" value="${esc(x.date)}"></label>
+   <label>Açıklama<input id="edDesc" value="${esc(x.description)}"></label>
+   <label>Tutar<input id="edAmount" type="number" step="0.01" min="0.01" value="${Number(x.amount)}"></label>
+   <label>Kategori<select id="edCat"><option value="">Kategorisiz</option>${arr.map(c=>`<option value="${esc(c)}" ${x.category===c?"selected":""}>${esc(c)}</option>`).join("")}</select></label>
+   <div class="edit-actions"><button id="edCancel" class="ghost">Vazgeç</button><button id="edSave" class="primary">Kaydet</button></div>
+ </div>`;
+ document.body.appendChild(modal);
+ modal.querySelector("#edCancel").onclick=()=>modal.remove();
+ modal.onclick=e=>{if(e.target===modal)modal.remove()};
+ modal.querySelector("#edSave").onclick=()=>{
+   const desc=modal.querySelector("#edDesc").value.trim();
+   const amount=Number(modal.querySelector("#edAmount").value);
+   const date=modal.querySelector("#edDate").value;
+   if(!desc)return alert("Açıklama gir.");
+   if(!date)return alert("Tarih seç.");
+   if(!amount||amount<=0)return alert("Geçerli tutar gir.");
+   x.date=date;x.description=desc;x.amount=amount;x.category=modal.querySelector("#edCat").value;
+   save();modal.remove();render();
+ };
+}
 function render(){
   const type=$("rtype").value,cat=$("rcat").value,period=$("period").value,now=new Date().toISOString().slice(0,7);
   let months=[];
@@ -108,7 +137,7 @@ function render(){
   const seen=new Set(),rows=[];
   details.sort((a,b)=>b.x.date.localeCompare(a.x.date));
   details.forEach(d=>{const key=d.x.id+"-"+d.v;if(!seen.has(key)){seen.add(key);rows.push(d)}});
-  $("detailList").innerHTML=rows.map(d=>`<tr><td>${new Date(d.x.date+"T00:00:00").toLocaleDateString("tr-TR")}</td><td>${esc(d.x.description)}</td><td>${esc(d.x.category||"Kategorisiz")}</td><td class="amount">${money(d.v)}</td></tr>`).join("")||'<tr><td colspan="4" class="empty">Kayıt bulunamadı.</td></tr>';
+  $("detailList").innerHTML=rows.map(d=>`<tr><td>${new Date(d.x.date+"T00:00:00").toLocaleDateString("tr-TR")}</td><td>${esc(d.x.description)}</td><td>${esc(d.x.category||"Kategorisiz")}</td><td class="amount">${money(d.v)}</td><td><button class="editBtn" data-id="${d.x.id}">Düzenle</button></td></tr>`).join("")||'<tr><td colspan="4" class="empty">Kayıt bulunamadı.</td></tr>';
   renderUncategorized();
 }
 function renderUncategorized(){
