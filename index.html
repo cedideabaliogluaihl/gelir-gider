@@ -4,81 +4,308 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1f4e78">
+<meta name="google-site-verification" content="">
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
-<title>Gelir Gider V2.0</title>
+<title>Gelir Gider</title>
 </head>
+
 <body>
+
 <header>
-  <div><h1>Gelir · Gider</h1><div class="sub">Kişisel para takibi</div></div>
+  <div>
+    <h1>Gelir · Gider <span style="font-size:14px;opacity:.7">V2.0</span></h1>
+    <div class="sub">Kişisel para takibi</div>
+  </div>
+
   <div class="header-actions">
+    <span id="userInfo" class="muted"></span>
+
+    <button id="loginBtn" class="primary" type="button">
+      Google ile giriş yap
+    </button>
+
+    <button id="logoutBtn" class="ghost" type="button" hidden>
+      Çıkış
+    </button>
+
     <a class="ghost link-btn" href="reports.html">Raporlar</a>
     <a class="ghost link-btn" href="settings.html">Ayarlar</a>
-    <button id="exportBtn" class="ghost">Yedekle</button>
+
+    <button id="exportBtn" class="ghost" type="button">
+      Yedekle
+    </button>
   </div>
 </header>
+
+<div id="authMessage"
+     style="display:none;padding:14px;text-align:center;background:#eef6ff;color:#1f4e78;font-weight:600;">
+</div>
+
 <main>
+
 <section class="summary">
-<div class="card income"><span>Toplam Gelir</span><strong id="totalIncome">0 ₺</strong></div>
-<div class="card expense"><span>Toplam Gider</span><strong id="totalExpense">0 ₺</strong></div>
-<div class="card net"><span>Net</span><strong id="net">0 ₺</strong></div>
-<div class="card transfer"><span>Kasaya Aktarılan</span><strong id="totalTransfer">0 ₺</strong></div>
+
+<div class="card income">
+  <span>Toplam Gelir</span>
+  <strong id="totalIncome">0 ₺</strong>
+</div>
+
+<div class="card expense">
+  <span>Toplam Gider</span>
+  <strong id="totalExpense">0 ₺</strong>
+</div>
+
+<div class="card net">
+  <span>Net</span>
+  <strong id="net">0 ₺</strong>
+</div>
+
+<div class="card transfer">
+  <span>Kasaya Aktarılan</span>
+  <strong id="totalTransfer">0 ₺</strong>
+</div>
+
 </section>
 
+
 <section class="panel">
-<div class="panel-head"><h2>Yeni İşlem</h2><a href="settings.html" class="small-link">Sabitleri Ayarla</a></div>
+
+<div class="panel-head">
+  <h2>Yeni İşlem</h2>
+  <a href="settings.html" class="small-link">Sabitleri Ayarla</a>
+</div>
+
 <form id="form">
+
 <input id="date" type="date" required>
-<input id="description" type="text" placeholder="Açıklama" required>
+
+<input id="description"
+       type="text"
+       placeholder="Açıklama"
+       required>
+
 <select id="type">
-<option value="Gider">Gider</option><option value="Gelir">Gelir</option><option value="Kasa Transferi">Kasa Transferi</option>
+  <option value="Gider">Gider</option>
+  <option value="Gelir">Gelir</option>
+  <option value="Kasa Transferi">Kasa Transferi</option>
 </select>
-<select id="payment"><option value="Nakit">Nakit</option><option value="Kredi Kartı">Kredi Kartı</option></select>
-<select id="card" disabled><option value="">Kart seç</option></select>
-<select id="category"><option>Genel</option></select>
-<input id="amount" type="number" step="0.01" min="0.01" placeholder="Tutar" required>
-<div id="installmentBox" class="installment-box" hidden>
-<label><input id="installment" type="checkbox"> Taksitli alışveriş</label>
+
+<select id="payment">
+  <option value="Nakit">Nakit</option>
+  <option value="Kredi Kartı">Kredi Kartı</option>
+</select>
+
+<select id="card" disabled>
+  <option value="">Kart seç</option>
+</select>
+
+<select id="category">
+  <option>Genel</option>
+</select>
+
+<input id="amount"
+       type="number"
+       step="0.01"
+       min="0.01"
+       placeholder="Tutar"
+       required>
+
+<div id="installmentBox"
+     class="installment-box"
+     hidden>
+
+<label>
+  <input id="installment" type="checkbox">
+  Taksitli alışveriş
+</label>
+
 <div id="installmentFields" hidden>
+
 <select id="installmentCount">
-<option value="2">2 taksit</option><option value="3">3 taksit</option><option value="4">4 taksit</option>
-<option value="5">5 taksit</option><option value="6">6 taksit</option><option value="7">7 taksit</option>
-<option value="8">8 taksit</option><option value="9">9 taksit</option><option value="10">10 taksit</option>
-<option value="11">11 taksit</option><option value="12">12 taksit</option><option value="18">18 taksit</option>
-<option value="24">24 taksit</option><option value="36">36 taksit</option>
+
+<option value="2">2 taksit</option>
+<option value="3">3 taksit</option>
+<option value="4">4 taksit</option>
+<option value="5">5 taksit</option>
+<option value="6">6 taksit</option>
+<option value="7">7 taksit</option>
+<option value="8">8 taksit</option>
+<option value="9">9 taksit</option>
+<option value="10">10 taksit</option>
+<option value="11">11 taksit</option>
+<option value="12">12 taksit</option>
+<option value="18">18 taksit</option>
+<option value="24">24 taksit</option>
+<option value="36">36 taksit</option>
+
 </select>
-<div id="installmentPreview" class="installment-preview"></div>
+
+<div id="installmentPreview"
+     class="installment-preview"></div>
+
 </div>
 </div>
-<button class="primary" type="submit">+ EKLE</button>
+
+<button class="primary" type="submit">
+  + EKLE
+</button>
+
 </form>
+
 </section>
 
+
 <section class="panel">
-<div class="panel-head"><h2>Kredi Kartı Özeti</h2><span class="muted">Toplam alışveriş / bu ay / kalan</span></div>
+
+<div class="panel-head">
+  <h2>Kredi Kartı Özeti</h2>
+  <span class="muted">
+    Bu ay / limit / kalan
+  </span>
+</div>
+
 <div id="cardSummary" class="cards"></div>
+
 </section>
+
 
 <section class="panel compact-link-panel">
-<div class="panel-head"><div><h2>Kredi Kartı Taksitleri</h2><span class="muted">İleri dönem taksitleri ayrı sayfada</span></div>
-<a class="primary page-link" href="installments.html">Taksitleri Gör →</a></div>
-</section>
 
-<section class="panel">
-<div class="panel-head"><h2>Bu Ayın Özeti</h2><span id="currentMonthLabel" class="muted"></span></div>
-<div class="month-grid">
-<div><span>Gelir</span><strong id="monthIncome">0 ₺</strong></div><div><span>Gider</span><strong id="monthExpense">0 ₺</strong></div>
-<div><span>Net</span><strong id="monthNet">0 ₺</strong></div><div><span>Kasaya Aktarılan</span><strong id="monthTransfer">0 ₺</strong></div>
+<div class="panel-head">
+
+<div>
+<h2>Kredi Kartı Taksitleri</h2>
+<span class="muted">
+İleri dönem taksitleri ayrı sayfada
+</span>
 </div>
+
+<a class="primary page-link"
+   href="installments.html">
+Taksitleri Gör →
+</a>
+
+</div>
+
 </section>
 
+
 <section class="panel">
-<div class="panel-head"><h2 id="transactionsTitle">Bu Ayın İşlemleri</h2><div class="actions"><button id="clearBtn" class="danger-outline">Seçiliyi Sil</button><button id="clearAllBtn" class="danger-outline">Tümünü Temizle</button></div></div>
-<div class="table-wrap"><table><thead><tr><th></th><th>Tarih</th><th>Açıklama</th><th>Kategori</th><th>Tür</th><th>Ödeme</th><th>Kart</th><th>Taksit</th><th>Tutar</th></tr></thead>
-<tbody id="list"></tbody></table><div id="empty" class="empty">Henüz işlem yok.</div></div>
+
+<div class="panel-head">
+
+<h2>Bu Ayın Özeti</h2>
+
+<span id="currentMonthLabel"
+      class="muted"></span>
+
+</div>
+
+<div class="month-grid">
+
+<div>
+<span>Gelir</span>
+<strong id="monthIncome">0 ₺</strong>
+</div>
+
+<div>
+<span>Gider</span>
+<strong id="monthExpense">0 ₺</strong>
+</div>
+
+<div>
+<span>Net</span>
+<strong id="monthNet">0 ₺</strong>
+</div>
+
+<div>
+<span>Kasaya Aktarılan</span>
+<strong id="monthTransfer">0 ₺</strong>
+</div>
+
+</div>
+
 </section>
-<p class="note">Ana ekran yalnızca güncel ayı gösterir. Eski kayıtlar silinmez; geçmiş ayları ve kategori toplamlarını <a href="reports.html">Raporlar</a> bölümünden görebilirsin.</p>
+
+
+<section class="panel">
+
+<div class="panel-head">
+
+<h2 id="transactionsTitle">
+Bu Ayın İşlemleri
+</h2>
+
+<div class="actions">
+
+<button id="clearBtn"
+        class="danger-outline"
+        type="button">
+Seçiliyi Sil
+</button>
+
+<button id="clearAllBtn"
+        class="danger-outline"
+        type="button">
+Tümünü Temizle
+</button>
+
+</div>
+
+</div>
+
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+<th></th>
+<th>Tarih</th>
+<th>Açıklama</th>
+<th>Kategori</th>
+<th>Tür</th>
+<th>Ödeme</th>
+<th>Kart</th>
+<th>Taksit</th>
+<th>Tutar</th>
+</tr>
+
+</thead>
+
+<tbody id="list"></tbody>
+
+</table>
+
+<div id="empty"
+     class="empty">
+Henüz işlem yok.
+</div>
+
+</div>
+
+</section>
+
+
+<p class="note">
+
+Ana ekran yalnızca güncel ayı gösterir.
+Eski kayıtlar silinmez.
+
+Veriler Firebase hesabınıza bağlı olarak saklanır.
+
+<a href="reports.html">Raporlar</a>
+
+</p>
+
 </main>
-<script type="module" src="app.js?v=14"></script>
+
+
+<!-- Firebase -->
+<script type="module" src="app.js?v=20"></script>
+
 </body>
 </html>
