@@ -1,700 +1,559 @@
 <!doctype html>
 <html lang="tr">
-
 <head>
-<meta charset="utf-8">
+  <meta charset="utf-8">
 
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1,viewport-fit=cover"
->
+  <meta name="viewport"
+        content="width=device-width,initial-scale=1,viewport-fit=cover">
 
-<meta
-  name="theme-color"
-  content="#1f4e78"
->
+  <meta name="theme-color" content="#1f4e78">
 
-<link
-  rel="stylesheet"
-  href="style.css"
->
+  <title>Gelir Gider - Raporlar</title>
 
-<title>Raporlar - Gelir Gider</title>
+  <style>
+    *{
+      box-sizing:border-box;
+    }
 
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:#f3f6fa;
+      color:#17202a;
+    }
+
+    header{
+      background:#1f4e78;
+      color:white;
+      padding:28px 6%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+
+    header h1{
+      margin:0 0 6px;
+      font-size:28px;
+    }
+
+    header p{
+      margin:0;
+      opacity:.9;
+    }
+
+    button{
+      border:0;
+      border-radius:8px;
+      padding:12px 18px;
+      font-size:15px;
+      cursor:pointer;
+    }
+
+    .home-btn{
+      background:transparent;
+      color:white;
+      border:1px solid rgba(255,255,255,.6);
+    }
+
+    .authbar{
+      background:#edf5ff;
+      padding:14px 6%;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:18px;
+      border-bottom:1px solid #d7e2ee;
+      font-size:17px;
+    }
+
+    .authbar button{
+      background:white;
+      color:#1f4e78;
+      border:1px solid #1f4e78;
+      font-weight:bold;
+    }
+
+    .container{
+      width:min(1150px,92%);
+      margin:28px auto;
+    }
+
+    .card{
+      background:white;
+      border-radius:16px;
+      padding:20px;
+      margin-bottom:20px;
+      box-shadow:0 3px 15px rgba(0,0,0,.06);
+    }
+
+    .card h2{
+      margin:0 0 16px;
+      font-size:20px;
+    }
+
+    .filters{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:14px;
+    }
+
+    label{
+      display:block;
+      margin-bottom:7px;
+      color:#617080;
+      font-size:14px;
+    }
+
+    select{
+      width:100%;
+      padding:13px;
+      border:1px solid #cbd5df;
+      border-radius:9px;
+      background:white;
+      font-size:15px;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin-bottom:20px;
+    }
+
+    .stat{
+      background:white;
+      border-radius:16px;
+      padding:18px;
+      box-shadow:0 3px 15px rgba(0,0,0,.06);
+      border-left:5px solid #1f4e78;
+    }
+
+    .stat:nth-child(1){
+      border-left-color:#27ae60;
+    }
+
+    .stat:nth-child(2){
+      border-left-color:#e74c3c;
+    }
+
+    .stat:nth-child(3){
+      border-left-color:#3498db;
+    }
+
+    .stat:nth-child(4){
+      border-left-color:#f1c40f;
+    }
+
+    .stat-title{
+      color:#718096;
+      font-size:14px;
+      margin-bottom:8px;
+    }
+
+    .stat-value{
+      font-size:23px;
+      font-weight:bold;
+    }
+
+    .table-wrap{
+      overflow-x:auto;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+    }
+
+    th,td{
+      padding:13px 10px;
+      border-bottom:1px solid #e7edf2;
+      text-align:left;
+    }
+
+    th{
+      color:#637282;
+      font-size:14px;
+    }
+
+    td.amount,
+    th.amount{
+      text-align:right;
+      font-weight:bold;
+    }
+
+    .income{
+      color:#168a45;
+    }
+
+    .expense{
+      color:#c0392b;
+    }
+
+    .empty{
+      padding:30px;
+      text-align:center;
+      color:#718096;
+    }
+
+    .error{
+      background:#fdecea;
+      color:#a93226;
+      border:1px solid #f5c6c2;
+      padding:15px;
+      border-radius:10px;
+      margin-bottom:20px;
+      display:none;
+    }
+
+    .loading{
+      text-align:center;
+      padding:30px;
+      color:#617080;
+    }
+
+    .login{
+      text-align:center;
+      padding:50px 20px;
+    }
+
+    .login button{
+      background:#1f4e78;
+      color:white;
+      font-weight:bold;
+      margin-top:15px;
+    }
+
+    @media(max-width:800px){
+      .filters{
+        grid-template-columns:1fr;
+      }
+
+      .stats{
+        grid-template-columns:1fr 1fr;
+      }
+
+      header{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+    }
+
+    @media(max-width:500px){
+      .stats{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
 <header>
-
   <div>
+    <h1>Raporlar</h1>
+    <p>Geçmiş ayları ve kategorileri incele</p>
+  </div>
 
-    <h1>
-      Raporlar
-      <small style="font-size:11px;opacity:.7">
-        V2.0
-      </small>
-    </h1>
+  <button class="home-btn" onclick="location.href='index.html'">
+    ← Ana Sayfa
+  </button>
+</header>
 
-    <div class="sub">
-      Geçmiş ayları ve kategorileri incele
+<div class="authbar">
+  <span id="userStatus">Firebase bağlantısı hazırlanıyor...</span>
+  <button id="loginBtn" style="display:none;">Google ile giriş yap</button>
+  <button id="logoutBtn" style="display:none;">Çıkış Yap</button>
+</div>
+
+<div class="container">
+
+  <div id="errorBox" class="error"></div>
+
+  <div id="loginBox" class="card login" style="display:none;">
+    <h2>Raporları görmek için giriş yapmalısın</h2>
+    <p>Google hesabınla giriş yaptıktan sonra Firebase'deki gelir ve gider kayıtların okunacaktır.</p>
+    <button id="loginBtn2">Google ile giriş yap</button>
+  </div>
+
+  <div id="loadingBox" class="card loading">
+    Veriler Firebase'den yükleniyor...
+  </div>
+
+  <div id="reportArea" style="display:none;">
+
+    <div class="card">
+      <h2>Filtre</h2>
+
+      <div class="filters">
+
+        <div>
+          <label for="typeFilter">Tür</label>
+          <select id="typeFilter">
+            <option value="Gelir">Gelir</option>
+            <option value="Gider">Gider</option>
+            <option value="Tümü">Tümü</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="categoryFilter">Kategori</label>
+          <select id="categoryFilter">
+            <option value="Tümü">Tüm Kategoriler</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="periodFilter">Dönem</label>
+          <select id="periodFilter">
+            <option value="Tümü">Tüm Dönem</option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="stats">
+
+      <div class="stat">
+        <div class="stat-title">Seçilen Toplam</div>
+        <div class="stat-value" id="totalValue">₺0,00</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">Aylık Ortalama</div>
+        <div class="stat-value" id="averageValue">₺0,00</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">En Yüksek Ay</div>
+        <div class="stat-value" id="highestMonth">-</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">İşlem Sayısı</div>
+        <div class="stat-value" id="transactionCount">0</div>
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <h2>Aylık Dağılım</h2>
+
+      <p id="tableSubtitle" style="color:#718096;">
+        Gelir · Tüm Dönem
+      </p>
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Ay</th>
+              <th class="amount">Tutar</th>
+              <th>İşlem Sayısı</th>
+            </tr>
+          </thead>
+
+          <tbody id="monthlyTable"></tbody>
+
+        </table>
+
+        <div id="emptyBox"
+             class="empty"
+             style="display:none;">
+          Bu filtreye uygun kayıt bulunamadı.
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <h2>İşlemler</h2>
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Tarih</th>
+              <th>Açıklama</th>
+              <th>Kategori</th>
+              <th>Tür</th>
+              <th class="amount">Tutar</th>
+            </tr>
+          </thead>
+
+          <tbody id="transactionsTable"></tbody>
+
+        </table>
+
+      </div>
+
     </div>
 
   </div>
-
-  <div class="header-actions">
-
-    <a
-      class="ghost link-btn"
-      href="index.html"
-    >
-      ← Ana Sayfa
-    </a>
-
-  </div>
-
-</header>
-
-
-<!-- =========================================================
-     FIREBASE DURUMU
-========================================================= -->
-
-<div
-  id="firebaseBar"
-  style="
-    width:100%;
-    box-sizing:border-box;
-    padding:10px 16px;
-    background:#eef6ff;
-    border-bottom:1px solid #cbdcec;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:12px;
-    flex-wrap:wrap;
-    font-family:Arial,sans-serif;
-  "
->
-
-  <span id="firebaseStatus">
-    Firebase bağlantısı kontrol ediliyor...
-  </span>
-
-  <button
-    id="loginBtn"
-    type="button"
-    style="
-      background:#1f4e78;
-      color:white;
-      border:0;
-      border-radius:8px;
-      padding:9px 15px;
-      font-weight:600;
-      cursor:pointer;
-    "
-  >
-    Google ile giriş yap
-  </button>
-
-  <button
-    id="logoutBtn"
-    type="button"
-    style="
-      display:none;
-      background:white;
-      color:#1f4e78;
-      border:1px solid #1f4e78;
-      border-radius:8px;
-      padding:9px 15px;
-      font-weight:600;
-      cursor:pointer;
-    "
-  >
-    Çıkış Yap
-  </button>
 
 </div>
 
 
-<main>
-
-
-<!-- =========================================================
-     FİLTRE
-========================================================= -->
-
-<section class="panel">
-
-  <div class="panel-head">
-
-    <h2>Filtre</h2>
-
-  </div>
-
-
-  <div class="report-filter">
-
-    <label>
-
-      Tür
-
-      <select id="rtype">
-
-        <option value="Gelir">
-          Gelir
-        </option>
-
-        <option value="Gider">
-          Gider
-        </option>
-
-      </select>
-
-    </label>
-
-
-    <label>
-
-      Kategori
-
-      <select id="rcat">
-
-        <option value="all">
-          Tüm Kategoriler
-        </option>
-
-      </select>
-
-    </label>
-
-
-    <label>
-
-      Dönem
-
-      <select id="period">
-
-        <option value="3">
-          Son 3 Ay
-        </option>
-
-        <option
-          value="7"
-          selected
-        >
-          Son 7 Ay
-        </option>
-
-        <option value="12">
-          Son 12 Ay
-        </option>
-
-        <option value="all">
-          Tüm Dönem
-        </option>
-
-      </select>
-
-    </label>
-
-  </div>
-
-
-  <div
-    id="filterInfo"
-    class="filter-info"
-  ></div>
-
-</section>
-
-
-<!-- =========================================================
-     ÖZET
-========================================================= -->
-
-<section class="summary">
-
-  <div class="card income">
-
-    <span>
-      Seçilen Toplam
-    </span>
-
-    <strong id="selectedTotal">
-      0 ₺
-    </strong>
-
-  </div>
-
-
-  <div class="card expense">
-
-    <span>
-      Aylık Ortalama
-    </span>
-
-    <strong id="average">
-      0 ₺
-    </strong>
-
-  </div>
-
-
-  <div class="card net">
-
-    <span>
-      En Yüksek Ay
-    </span>
-
-    <strong id="maxMonth">
-      -
-    </strong>
-
-  </div>
-
-
-  <div class="card transfer">
-
-    <span>
-      İşlem Sayısı
-    </span>
-
-    <strong id="count">
-      0
-    </strong>
-
-  </div>
-
-</section>
-
-
-<!-- =========================================================
-     AYLIK DAĞILIM
-========================================================= -->
-
-<section class="panel">
-
-  <div class="panel-head">
-
-    <div>
-
-      <h2>
-        Aylık Dağılım
-      </h2>
-
-      <span
-        id="reportTitle"
-        class="muted"
-      ></span>
-
-    </div>
-
-  </div>
-
-
-  <div class="table-wrap">
-
-    <table>
-
-      <thead>
-
-        <tr>
-
-          <th>
-            Ay
-          </th>
-
-          <th>
-            Tutar
-          </th>
-
-          <th>
-            İşlem Sayısı
-          </th>
-
-        </tr>
-
-      </thead>
-
-      <tbody
-        id="reportList"
-      ></tbody>
-
-    </table>
-
-  </div>
-
-</section>
-
-
-<!-- =========================================================
-     İŞLEMLER
-========================================================= -->
-
-<section class="panel">
-
-  <div class="panel-head">
-
-    <h2>
-      İşlemler
-    </h2>
-
-  </div>
-
-
-  <div class="table-wrap">
-
-    <table>
-
-      <thead>
-
-        <tr>
-
-          <th>
-            Tarih
-          </th>
-
-          <th>
-            Açıklama
-          </th>
-
-          <th>
-            Kategori
-          </th>
-
-          <th>
-            Tutar
-          </th>
-
-          <th>
-            İşlem
-          </th>
-
-        </tr>
-
-      </thead>
-
-
-      <tbody
-        id="detailList"
-      ></tbody>
-
-    </table>
-
-  </div>
-
-</section>
-
-
-<!-- =========================================================
-     KATEGORİSİZ
-========================================================= -->
-
-<section class="panel">
-
-  <div class="panel-head">
-
-    <div>
-
-      <h2>
-        Kategorisiz Eski Kayıtlar
-      </h2>
-
-      <span class="muted">
-        Eski kayıtları Düzenle ile kategorilendir.
-      </span>
-
-    </div>
-
-  </div>
-
-
-  <div class="table-wrap">
-
-    <table>
-
-      <thead>
-
-        <tr>
-
-          <th>
-            Tarih
-          </th>
-
-          <th>
-            Açıklama
-          </th>
-
-          <th>
-            Tür
-          </th>
-
-          <th>
-            Tutar
-          </th>
-
-          <th>
-            Kategori
-          </th>
-
-          <th>
-            İşlem
-          </th>
-
-        </tr>
-
-      </thead>
-
-
-      <tbody
-        id="uncatList"
-      ></tbody>
-
-    </table>
-
-  </div>
-
-</section>
-
-
-<p class="note">
-
-  Eski kayıtlar silinmez.
-  Düzenle butonuyla kategori,
-  açıklama, tarih veya tutarı değiştirebilirsin.
-
-</p>
-
-
-</main>
-
-
-<!-- =========================================================
-     FIREBASE + RAPOR KODU
-========================================================= -->
-
 <script type="module">
 
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+  /*
+   * =========================================================
+   * FIREBASE
+   * =========================================================
+   */
+
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+
+  import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+  import {
+    getFirestore,
+    doc,
+    getDoc
+  } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
 
-import {
-
-  getAuth,
-
-  GoogleAuthProvider,
-
-  signInWithPopup,
-
-  signOut,
-
-  onAuthStateChanged
-
-}
-from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyC8Pk7DCPwmb5RK2NQCBPEv692-lzeeo4c",
+    authDomain: "gelir-gider-546b4.firebaseapp.com",
+    projectId: "gelir-gider-546b4",
+    storageBucket: "gelir-gider-546b4.firebasestorage.app",
+    messagingSenderId: "682384311790",
+    appId: "1:682384311790:web:2ba8621cec98145232faff"
+  };
 
 
-import {
+  const app = initializeApp(firebaseConfig);
 
-  getFirestore,
+  const auth = getAuth(app);
 
-  doc,
+  const db = getFirestore(app);
 
-  getDoc,
-
-  setDoc
-
-}
-from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+  const provider = new GoogleAuthProvider();
 
 
-// =========================================================
-// FIREBASE AYARLARI
-// =========================================================
+  /*
+   * =========================================================
+   * DEĞİŞKENLER
+   * =========================================================
+   */
 
-const firebaseConfig = {
-
-  apiKey:
-    "AIzaSyC8Pk7DCPwmb5RK2NQCBPEv692-lzeeo4c",
-
-  authDomain:
-    "gelir-gider-546b4.firebaseapp.com",
-
-  projectId:
-    "gelir-gider-546b4",
-
-  storageBucket:
-    "gelir-gider-546b4.firebasestorage.app",
-
-  messagingSenderId:
-    "682384311790",
-
-  appId:
-    "1:682384311790:web:2ba8621cec98145232faff"
-
-};
+  let allItems = [];
 
 
-// =========================================================
-// FIREBASE BAŞLAT
-// =========================================================
+  /*
+   * =========================================================
+   * ELEMENTLER
+   * =========================================================
+   */
 
-const app =
-  initializeApp(firebaseConfig);
+  const userStatus =
+    document.getElementById("userStatus");
 
+  const loginBtn =
+    document.getElementById("loginBtn");
 
-const auth =
-  getAuth(app);
+  const loginBtn2 =
+    document.getElementById("loginBtn2");
 
+  const logoutBtn =
+    document.getElementById("logoutBtn");
 
-const db =
-  getFirestore(app);
+  const loginBox =
+    document.getElementById("loginBox");
 
+  const loadingBox =
+    document.getElementById("loadingBox");
 
-const provider =
-  new GoogleAuthProvider();
+  const reportArea =
+    document.getElementById("reportArea");
 
+  const errorBox =
+    document.getElementById("errorBox");
 
-let currentUser = null;
+  const typeFilter =
+    document.getElementById("typeFilter");
 
-let items = [];
+  const categoryFilter =
+    document.getElementById("categoryFilter");
 
-let settings = {
+  const periodFilter =
+    document.getElementById("periodFilter");
 
-  cards: [
+  const totalValue =
+    document.getElementById("totalValue");
 
-    {
-      name: "Kart 1",
-      limit: 0
-    },
+  const averageValue =
+    document.getElementById("averageValue");
 
-    {
-      name: "Kart 2",
-      limit: 0
-    },
+  const highestMonth =
+    document.getElementById("highestMonth");
 
-    {
-      name: "Kart 3",
-      limit: 0
-    }
+  const transactionCount =
+    document.getElementById("transactionCount");
 
-  ],
+  const monthlyTable =
+    document.getElementById("monthlyTable");
 
-  incomeCategories: [
+  const transactionsTable =
+    document.getElementById("transactionsTable");
 
-    "Maaş",
-    "Ek Ders",
-    "Diğer Gelir"
+  const emptyBox =
+    document.getElementById("emptyBox");
 
-  ],
-
-  expenseCategories: [
-
-    "Kira",
-    "Market",
-    "Fatura",
-    "Yakıt",
-    "Nakit",
-    "Diğer Gider"
-
-  ]
-
-};
+  const tableSubtitle =
+    document.getElementById("tableSubtitle");
 
 
-// =========================================================
-// YARDIMCI
-// =========================================================
+  /*
+   * =========================================================
+   * PARA FORMAT
+   * =========================================================
+   */
 
-const $ =
-  id =>
-    document.getElementById(id);
+  function money(value){
 
-
-const money =
-  n =>
-
-    new Intl.NumberFormat(
+    return new Intl.NumberFormat(
       "tr-TR",
       {
-        style: "currency",
-        currency: "TRY",
-        maximumFractionDigits: 2
+        style:"currency",
+        currency:"TRY",
+        maximumFractionDigits:2
       }
-    ).format(
-      Number(n) || 0
-    );
+    ).format(Number(value) || 0);
+
+  }
 
 
-const esc =
-  s =>
+  /*
+   * =========================================================
+   * TARİH
+   * =========================================================
+   */
 
-    String(s ?? "")
-      .replace(
-        /[&<>"']/g,
+  function monthName(month){
 
-        m => ({
+    if(!month) return "-";
 
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#039;"
+    const d =
+      new Date(month + "-01T00:00:00");
 
-        }[m])
-
-      );
-
-
-function ym(d) {
-
-  return String(d ?? "")
-    .slice(0,7);
-
-}
-
-
-function addMonths(z,n) {
-
-  let [
-    y,
-    m
-  ] =
-    z
-      .split("-")
-      .map(Number);
-
-  m += n;
-
-  y +=
-    Math.floor(
-      (m - 1) / 12
-    );
-
-  m =
-    (m - 1) % 12 + 1;
-
-  return (
-
-    y +
-    "-" +
-    String(m)
-      .padStart(2,"0")
-
-  );
-
-}
-
-
-function monthLabel(m) {
-
-  return new Date(
-    m +
-    "-01T00:00:00"
-  )
-    .toLocaleDateString(
+    return d.toLocaleDateString(
       "tr-TR",
       {
         month:"long",
@@ -702,1456 +561,697 @@ function monthLabel(m) {
       }
     );
 
-}
+  }
 
 
-// =========================================================
-// KREDİ KARTI
-// =========================================================
+  /*
+   * =========================================================
+   * HATA
+   * =========================================================
+   */
 
-function isCard(x) {
+  function showError(message){
 
-  return (
+    errorBox.textContent =
+      "Giriş / veri işlemi başarısız: " + message;
 
-    x.type === "Gider" &&
-
-    x.payment ===
-      "Kredi Kartı" &&
-
-    typeof x.card ===
-      "string" &&
-
-    x.card.startsWith("c")
-
-  );
-
-}
-
-
-function inst(x) {
-
-  return Math.max(
-    1,
-    Number(
-      x.installments
-    ) || 1
-  );
-
-}
-
-
-function due(x,m) {
-
-  if (!isCard(x)) {
-
-    return 0;
+    errorBox.style.display = "block";
 
   }
 
 
-  const s =
-    ym(x.date);
+  function clearError(){
 
+    errorBox.textContent = "";
 
-  const d =
-
-    (
-      +m.slice(0,4) -
-      +s.slice(0,4)
-    ) * 12 +
-
-    (
-      +m.slice(5) -
-      +s.slice(5)
-    );
-
-
-  return (
-
-    d >= 0 &&
-    d < inst(x)
-
-  )
-
-    ? Number(x.amount) /
-      inst(x)
-
-    : 0;
-
-}
-
-
-// =========================================================
-// FIRESTORE KULLANICI DOKÜMANI
-// =========================================================
-
-function userRef() {
-
-  if (!currentUser) {
-
-    return null;
+    errorBox.style.display = "none";
 
   }
 
 
-  return doc(
+  /*
+   * =========================================================
+   * GOOGLE GİRİŞ
+   * =========================================================
+   */
 
-    db,
+  async function login(){
 
-    "users",
+    clearError();
 
-    currentUser.uid
-
-  );
-
-}
-
-
-// =========================================================
-// FIRESTORE OKU
-// =========================================================
-
-async function loadCloud() {
-
-  const ref =
-    userRef();
-
-  if (!ref) {
-
-    throw new Error(
-      "Firebase kullanıcısı bulunamadı."
-    );
-
-  }
-
-
-  const snap =
-    await getDoc(ref);
-
-
-  if (!snap.exists()) {
-
-    items = [];
-
-    return;
-
-  }
-
-
-  const data =
-    snap.data();
-
-
-  if (
-    Array.isArray(
-      data.items
-    )
-  ) {
-
-    items =
-      data.items;
-
-  }
-
-
-  if (
-    data.settings &&
-    typeof data.settings ===
-      "object"
-  ) {
-
-    settings =
-      data.settings;
-
-  }
-
-}
-
-
-// =========================================================
-// FIRESTORE KAYDET
-// =========================================================
-
-async function saveCloud() {
-
-  const ref =
-    userRef();
-
-  if (!ref) {
-
-    throw new Error(
-      "Firebase kullanıcısı bulunamadı."
-    );
-
-  }
-
-
-  await setDoc(
-
-    ref,
-
-    {
-
-      items,
-
-      settings,
-
-      updatedAt:
-        new Date()
-          .toISOString()
-
-    },
-
-    {
-      merge:true
-    }
-
-  );
-
-}
-
-
-// =========================================================
-// KATEGORİLER
-// =========================================================
-
-function populateCategories() {
-
-  const type =
-    $("rtype").value;
-
-
-  const arr =
-    type === "Gelir"
-
-      ? settings.incomeCategories
-
-      : settings.expenseCategories;
-
-
-  $("rcat").innerHTML =
-
-    `<option value="all">
-      Tüm Kategoriler
-    </option>
-
-    <option value="uncategorized">
-      Kategorisiz Eski Kayıtlar
-    </option>`
-
-    +
-
-    arr
-      .map(
-
-        c =>
-
-          `<option value="${esc(c)}">
-            ${esc(c)}
-          </option>`
-
-      )
-      .join("");
-
-}
-
-
-// =========================================================
-// AYLIK DEĞER
-// =========================================================
-
-function valueForMonth(x,m) {
-
-  if (
-    x.type === "Gider" &&
-    isCard(x)
-  ) {
-
-    return due(x,m);
-
-  }
-
-
-  if (
-    x.type === "Gelir" ||
-    x.type === "Gider"
-  ) {
-
-    return
-
-      String(x.date)
-        .startsWith(m)
-
-        ? Number(x.amount) || 0
-
-        : 0;
-
-  }
-
-
-  return 0;
-
-}
-
-
-// =========================================================
-// RAPOR
-// =========================================================
-
-function render() {
-
-  const type =
-    $("rtype").value;
-
-
-  const cat =
-    $("rcat").value;
-
-
-  const period =
-    $("period").value;
-
-
-  const now =
-    new Date()
-      .toISOString()
-      .slice(0,7);
-
-
-  const eligible =
-    x =>
-
-      x.type === type &&
-
-      (
-
-        cat === "all"
-
-        ? true
-
-        :
-
-        cat ===
-          "uncategorized"
-
-        ? !x.category
-
-        :
-
-        x.category === cat
-
-      );
-
-
-  let months = [];
-
-
-  if (
-    period === "all"
-  ) {
-
-    items
-
-      .filter(
-        x =>
-          x.type === type
-      )
-
-      .forEach(
-
-        x => {
-
-          const m =
-            ym(x.date);
-
-          if (
-            m &&
-            !months.includes(m)
-          ) {
-
-            months.push(m);
-
-          }
-
-        }
-
-      );
-
-
-    items
-
-      .filter(
-        x =>
-          type === "Gider" &&
-          isCard(x)
-      )
-
-      .forEach(
-
-        x => {
-
-          for (
-            let i = 0;
-            i < inst(x);
-            i++
-          ) {
-
-            const m =
-              addMonths(
-                ym(x.date),
-                i
-              );
-
-
-            if (
-              !months.includes(m)
-            ) {
-
-              months.push(m);
-
-            }
-
-          }
-
-        }
-
-      );
-
-
-    months.sort().reverse();
-
-  }
-
-  else {
-
-    for (
-      let i = 0;
-      i < Number(period);
-      i++
-    ) {
-
-      months.push(
-        addMonths(
-          now,
-          -i
-        )
-      );
-
-    }
-
-  }
-
-
-  let total = 0;
-
-  let count = 0;
-
-  let monthRows = [];
-
-  let details = [];
-
-
-  for (
-    const m of months
-  ) {
-
-    let val = 0;
-
-    let cnt = 0;
-
-
-    items
-
-      .filter(eligible)
-
-      .forEach(
-
-        x => {
-
-          const v =
-            valueForMonth(
-              x,
-              m
-            );
-
-
-          if (v > 0) {
-
-            val += v;
-
-            cnt++;
-
-
-            if (
-
-              String(x.date)
-                .startsWith(m)
-
-              ||
-
-              isCard(x)
-
-            ) {
-
-              details.push({
-                x,
-                v
-              });
-
-            }
-
-          }
-
-        }
-
-      );
-
-
-    if (
-      val > 0 ||
-      period === "all"
-    ) {
-
-      monthRows.push({
-        m,
-        val,
-        cnt
-      });
-
-    }
-
-
-    total += val;
-
-    count += cnt;
-
-  }
-
-
-  $("selectedTotal")
-    .textContent =
-      money(total);
-
-
-  $("average")
-    .textContent =
-
-      money(
-        monthRows.length
-          ? total /
-            monthRows.length
-          : 0
-      );
-
-
-  const max =
-    monthRows.reduce(
-
-      (a,b) =>
-        b.val > a.val
-          ? b
-          : a,
-
-      {
-        m:"-",
-        val:0
-      }
-
-    );
-
-
-  $("maxMonth")
-    .textContent =
-
-      max.val
-        ? monthLabel(max.m)
-        : "-";
-
-
-  $("count")
-    .textContent =
-      count;
-
-
-  $("reportTitle")
-    .textContent =
-
-      `${type}` +
-
-      (
-
-        cat ===
-          "uncategorized"
-
-          ? " · Kategorisiz"
-
-          :
-
-        cat !== "all"
-
-          ? " · " + cat
-
-          : ""
-
-      ) +
-
-      " · " +
-
-      (
-
-        period === "all"
-
-          ? "Tüm Dönem"
-
-          : "Son " +
-            period +
-            " Ay"
-
-      );
-
-
-  $("reportList")
-    .innerHTML =
-
-      monthRows
-
-        .map(
-
-          r =>
-
-            `<tr>
-
-              <td>
-                ${monthLabel(r.m)}
-              </td>
-
-              <td class="amount">
-                ${money(r.val)}
-              </td>
-
-              <td>
-                ${r.cnt}
-              </td>
-
-            </tr>`
-
-        )
-
-        .join("")
-
-      ||
-
-      `<tr>
-
-        <td
-          colspan="3"
-          class="empty"
-        >
-          Kayıt bulunamadı.
-        </td>
-
-      </tr>`;
-
-
-  // =======================================================
-  // DETAY
-  // =======================================================
-
-  details.sort(
-
-    (a,b) =>
-
-      String(b.x.date)
-        .localeCompare(
-          String(a.x.date)
-        )
-
-  );
-
-
-  const seen =
-    new Set();
-
-
-  const rows = [];
-
-
-  details.forEach(
-
-    d => {
-
-      const key =
-        String(d.x.id) +
-        "-" +
-        String(d.v);
-
-
-      if (
-        !seen.has(key)
-      ) {
-
-        seen.add(key);
-
-        rows.push(d);
-
-      }
-
-    }
-
-  );
-
-
-  $("detailList")
-    .innerHTML =
-
-      rows
-
-        .map(
-
-          d => `
-
-            <tr>
-
-              <td>
-
-                ${
-
-                  new Date(
-                    d.x.date +
-                    "T00:00:00"
-                  )
-                    .toLocaleDateString(
-                      "tr-TR"
-                    )
-
-                }
-
-              </td>
-
-
-              <td>
-                ${esc(
-                  d.x.description
-                )}
-              </td>
-
-
-              <td>
-                ${esc(
-                  d.x.category ||
-                  "Kategorisiz"
-                )}
-              </td>
-
-
-              <td class="amount">
-                ${money(d.v)}
-              </td>
-
-
-              <td>
-
-                <button
-                  type="button"
-                  class="editBtn"
-                  data-id="${d.x.id}"
-                >
-                  Düzenle
-                </button>
-
-              </td>
-
-            </tr>
-
-          `
-
-        )
-
-        .join("")
-
-      ||
-
-      `<tr>
-
-        <td
-          colspan="5"
-          class="empty"
-        >
-          Kayıt bulunamadı.
-        </td>
-
-      </tr>`;
-
-
-  renderUncategorized();
-
-}
-
-
-// =========================================================
-// KATEGORİSİZ
-// =========================================================
-
-function renderUncategorized() {
-
-  const type =
-    $("rtype").value;
-
-
-  const rows =
-
-    items.filter(
-
-      x =>
-
-        (
-          x.type === "Gelir" ||
-          x.type === "Gider"
-        )
-
-        &&
-
-        x.type === type
-
-        &&
-
-        !x.category
-
-    );
-
-
-  $("uncatList")
-    .innerHTML =
-
-      rows.length
-
-        ?
-
-          rows
-
-            .sort(
-
-              (a,b) =>
-
-                String(b.date)
-                  .localeCompare(
-                    String(a.date)
-                  )
-
-            )
-
-            .map(
-
-              x => `
-
-                <tr>
-
-                  <td>
-
-                    ${
-
-                      new Date(
-                        x.date +
-                        "T00:00:00"
-                      )
-                        .toLocaleDateString(
-                          "tr-TR"
-                        )
-
-                    }
-
-                  </td>
-
-
-                  <td>
-                    ${esc(
-                      x.description
-                    )}
-                  </td>
-
-
-                  <td>
-                    ${esc(x.type)}
-                  </td>
-
-
-                  <td class="amount">
-                    ${money(x.amount)}
-                  </td>
-
-
-                  <td>
-                    Kategorisiz
-                  </td>
-
-
-                  <td>
-
-                    <button
-                      type="button"
-                      class="editBtn"
-                      data-id="${x.id}"
-                    >
-                      Düzenle
-                    </button>
-
-                  </td>
-
-                </tr>
-
-              `
-
-            )
-
-            .join("")
-
-        :
-
-          `<tr>
-
-            <td
-              colspan="6"
-              class="empty"
-            >
-              Bu türde kategorisiz eski kayıt yok.
-            </td>
-
-          </tr>`;
-
-}
-
-
-// =========================================================
-// DÜZENLE
-// =========================================================
-
-function openEdit(id) {
-
-  const x =
-    items.find(
-      v =>
-        Number(v.id) ===
-        Number(id)
-    );
-
-
-  if (!x) {
-
-    alert(
-      "Kayıt bulunamadı."
-    );
-
-    return;
-
-  }
-
-
-  const arr =
-
-    x.type === "Gelir"
-
-      ? settings.incomeCategories
-
-      : settings.expenseCategories;
-
-
-  const modal =
-    document.createElement(
-      "div"
-    );
-
-
-  modal.className =
-    "edit-modal";
-
-
-  modal.innerHTML = `
-
-    <div class="edit-box">
-
-      <h2>
-        İşlemi Düzenle
-      </h2>
-
-
-      <label>
-
-        Tarih
-
-        <input
-          id="edDate"
-          type="date"
-          value="${esc(x.date)}"
-        >
-
-      </label>
-
-
-      <label>
-
-        Açıklama
-
-        <input
-          id="edDesc"
-          type="text"
-          value="${esc(x.description)}"
-        >
-
-      </label>
-
-
-      <label>
-
-        Tutar
-
-        <input
-          id="edAmount"
-          type="number"
-          step="0.01"
-          min="0.01"
-          value="${Number(x.amount)}"
-        >
-
-      </label>
-
-
-      <label>
-
-        Kategori
-
-        <select id="edCat">
-
-          <option value="">
-            Kategorisiz
-          </option>
-
-          ${
-
-            arr
-
-              .map(
-
-                c => `
-
-                  <option
-                    value="${esc(c)}"
-                    ${
-                      x.category === c
-                        ? "selected"
-                        : ""
-                    }
-                  >
-                    ${esc(c)}
-                  </option>
-
-                `
-
-              )
-
-              .join("")
-
-          }
-
-        </select>
-
-      </label>
-
-
-      <div class="edit-actions">
-
-        <button
-          type="button"
-          id="edCancel"
-          class="ghost"
-        >
-          Vazgeç
-        </button>
-
-
-        <button
-          type="button"
-          id="edSave"
-          class="primary"
-        >
-          Kaydet
-        </button>
-
-      </div>
-
-    </div>
-
-  `;
-
-
-  document.body.appendChild(
-    modal
-  );
-
-
-  modal
-    .querySelector(
-      "#edCancel"
-    )
-    .onclick =
-      () =>
-        modal.remove();
-
-
-  modal.addEventListener(
-
-    "click",
-
-    e => {
-
-      if (
-        e.target === modal
-      ) {
-
-        modal.remove();
-
-      }
-
-    }
-
-  );
-
-
-  modal
-    .querySelector(
-      "#edSave"
-    )
-    .onclick =
-
-      async () => {
-
-        const date =
-          modal
-            .querySelector(
-              "#edDate"
-            )
-            .value;
-
-
-        const desc =
-          modal
-            .querySelector(
-              "#edDesc"
-            )
-            .value
-            .trim();
-
-
-        const amount =
-          Number(
-            modal
-              .querySelector(
-                "#edAmount"
-              )
-              .value
-          );
-
-
-        const category =
-          modal
-            .querySelector(
-              "#edCat"
-            )
-            .value;
-
-
-        if (
-          !date ||
-          !desc ||
-          !amount ||
-          amount <= 0
-        ) {
-
-          alert(
-            "Tarih, açıklama ve geçerli tutar gerekli."
-          );
-
-          return;
-
-        }
-
-
-        x.date =
-          date;
-
-        x.description =
-          desc;
-
-        x.amount =
-          amount;
-
-        x.category =
-          category;
-
-
-        try {
-
-          await saveCloud();
-
-          modal.remove();
-
-          render();
-
-        }
-
-        catch(error) {
-
-          console.error(
-            error
-          );
-
-          alert(
-            "Kaydedilemedi:\n\n" +
-            error.code +
-            "\n\n" +
-            error.message
-          );
-
-        }
-
-      };
-
-}
-
-
-// =========================================================
-// DÜZENLE BUTONLARI
-// =========================================================
-
-document.addEventListener(
-
-  "click",
-
-  e => {
-
-    const btn =
-      e.target.closest(
-        ".editBtn"
-      );
-
-
-    if (!btn) {
-      return;
-    }
-
-
-    e.preventDefault();
-
-
-    openEdit(
-      btn.dataset.id
-    );
-
-  }
-
-);
-
-
-// =========================================================
-// GOOGLE GİRİŞ
-// =========================================================
-
-$("loginBtn").onclick =
-
-  async () => {
-
-    try {
-
-      $("loginBtn").disabled =
-        true;
-
-
-      $("firebaseStatus")
-        .textContent =
-          "Google hesabı açılıyor...";
-
+    try{
 
       await signInWithPopup(
         auth,
         provider
       );
 
-    }
+    }catch(error){
 
-    catch(error) {
+      console.error(error);
 
-      console.error(
-        "Firebase giriş hatası:",
-        error
-      );
-
-
-      $("firebaseStatus")
-        .textContent =
-          "Giriş başarısız.";
-
-
-      alert(
-
-        "Giriş başarısız:\n\n" +
-
-        error.code +
-
-        "\n\n" +
-
-        error.message
-
-      );
-
-    }
-
-    finally {
-
-      $("loginBtn").disabled =
-        false;
-
-    }
-
-  };
-
-
-// =========================================================
-// ÇIKIŞ
-// =========================================================
-
-$("logoutBtn").onclick =
-
-  async () => {
-
-    try {
-
-      await signOut(auth);
-
-    }
-
-    catch(error) {
-
-      alert(
-        "Çıkış yapılamadı:\n\n" +
-        error.message
-      );
-
-    }
-
-  };
-
-
-// =========================================================
-// AUTH DURUMU
-// =========================================================
-
-onAuthStateChanged(
-
-  auth,
-
-  async user => {
-
-    currentUser =
-      user || null;
-
-
-    if (!user) {
-
-      $("firebaseStatus")
-        .textContent =
-          "Firebase'e giriş yapılmamış.";
-
-
-      $("loginBtn")
-        .style.display =
-          "inline-block";
-
-
-      $("logoutBtn")
-        .style.display =
-          "none";
-
-
-      return;
-
-    }
-
-
-    $("firebaseStatus")
-      .textContent =
-
-        `☁️ ${
-          user.displayName ||
-          user.email ||
-          "Kullanıcı"
-        } — Firebase'e bağlı`;
-
-
-    $("loginBtn")
-      .style.display =
-        "none";
-
-
-    $("logoutBtn")
-      .style.display =
-        "inline-block";
-
-
-    try {
-
-      await loadCloud();
-
-
-      populateCategories();
-
-
-      $("rtype").onchange =
-
-        () => {
-
-          populateCategories();
-
-          render();
-
-        };
-
-
-      $("rcat").onchange =
-        render;
-
-
-      $("period").onchange =
-        render;
-
-
-      render();
-
-    }
-
-    catch(error) {
-
-      console.error(
-        "Firebase veri okuma hatası:",
-        error
-      );
-
-
-      alert(
-
-        "Firebase verileri okunamadı:\n\n" +
-
-        error.code +
-
-        "\n\n" +
-
-        error.message
-
+      showError(
+        error?.code ||
+        error?.message ||
+        "Bilinmeyen hata"
       );
 
     }
 
   }
 
-);
+
+  loginBtn.addEventListener(
+    "click",
+    login
+  );
+
+  loginBtn2.addEventListener(
+    "click",
+    login
+  );
+
+
+  /*
+   * =========================================================
+   * ÇIKIŞ
+   * =========================================================
+   */
+
+  logoutBtn.addEventListener(
+    "click",
+    async ()=>{
+
+      try{
+
+        await signOut(auth);
+
+      }catch(error){
+
+        console.error(error);
+
+        showError(
+          error?.code ||
+          error?.message ||
+          "Çıkış yapılamadı"
+        );
+
+      }
+
+    }
+  );
+
+
+  /*
+   * =========================================================
+   * FIRESTORE'DAN VERİ OKU
+   * =========================================================
+   */
+
+  async function loadUserData(user){
+
+    clearError();
+
+    loadingBox.style.display = "block";
+
+    reportArea.style.display = "none";
+
+    try{
+
+      /*
+       * Firestore yapımız:
+       *
+       * users
+       *   └── UID
+       *        ├── displayName
+       *        ├── email
+       *        ├── items
+       *        └── settings
+       */
+
+      const ref =
+        doc(
+          db,
+          "users",
+          user.uid
+        );
+
+      const snapshot =
+        await getDoc(ref);
+
+
+      if(!snapshot.exists()){
+
+        allItems = [];
+
+        showError(
+          "Bu Google hesabı için Firestore kaydı bulunamadı."
+        );
+
+      }else{
+
+        const data =
+          snapshot.data();
+
+        allItems =
+          Array.isArray(data.items)
+            ? data.items
+            : [];
+
+      }
+
+
+      buildFilters();
+
+      render();
+
+
+    }catch(error){
+
+      console.error(
+        "Firestore hata:",
+        error
+      );
+
+      showError(
+        error?.code ||
+        error?.message ||
+        "Firestore verisi okunamadı."
+      );
+
+    }finally{
+
+      loadingBox.style.display = "none";
+
+      reportArea.style.display = "block";
+
+    }
+
+  }
+
+
+  /*
+   * =========================================================
+   * FİLTRELERİ OLUŞTUR
+   * =========================================================
+   */
+
+  function buildFilters(){
+
+    /*
+     * Kategoriler
+     */
+
+    const categories =
+      [
+        ...new Set(
+          allItems
+            .map(x => x.category)
+            .filter(Boolean)
+        )
+      ]
+      .sort(
+        (a,b)=>
+          String(a).localeCompare(
+            String(b),
+            "tr"
+          )
+      );
+
+
+    categoryFilter.innerHTML =
+      `<option value="Tümü">Tüm Kategoriler</option>` +
+      categories
+        .map(
+          category =>
+            `<option value="${escapeHtml(category)}">
+              ${escapeHtml(category)}
+            </option>`
+        )
+        .join("");
+
+
+    /*
+     * Aylar
+     */
+
+    const months =
+      [
+        ...new Set(
+          allItems
+            .map(x => {
+              if(!x.date) return null;
+              return String(x.date).slice(0,7);
+            })
+            .filter(Boolean)
+        )
+      ]
+      .sort()
+      .reverse();
+
+
+    periodFilter.innerHTML =
+      `<option value="Tümü">Tüm Dönem</option>` +
+      months
+        .map(
+          month =>
+            `<option value="${month}">
+              ${monthName(month)}
+            </option>`
+        )
+        .join("");
+
+  }
+
+
+  /*
+   * =========================================================
+   * HTML GÜVENLİĞİ
+   * =========================================================
+   */
+
+  function escapeHtml(value){
+
+    return String(value ?? "")
+      .replace(
+        /[&<>"']/g,
+        function(char){
+
+          const map = {
+            "&":"&amp;",
+            "<":"&lt;",
+            ">":"&gt;",
+            '"':"&quot;",
+            "'":"&#039;"
+          };
+
+          return map[char];
+
+        }
+      );
+
+  }
+
+
+  /*
+   * =========================================================
+   * FİLTRELENMİŞ VERİ
+   * =========================================================
+   */
+
+  function getFilteredItems(){
+
+    const type =
+      typeFilter.value;
+
+    const category =
+      categoryFilter.value;
+
+    const period =
+      periodFilter.value;
+
+
+    return allItems.filter(item => {
+
+      if(
+        type !== "Tümü" &&
+        item.type !== type
+      ){
+
+        return false;
+
+      }
+
+
+      if(
+        category !== "Tümü" &&
+        item.category !== category
+      ){
+
+        return false;
+
+      }
+
+
+      if(
+        period !== "Tümü" &&
+        String(item.date || "")
+          .slice(0,7) !== period
+      ){
+
+        return false;
+
+      }
+
+
+      return true;
+
+    });
+
+  }
+
+
+  /*
+   * =========================================================
+   * RAPORU ÇİZ
+   * =========================================================
+   */
+
+  function render(){
+
+    const items =
+      getFilteredItems();
+
+
+    /*
+     * TOPLAM
+     */
+
+    const total =
+      items.reduce(
+        (sum,item)=>
+          sum + Number(item.amount || 0),
+        0
+      );
+
+
+    /*
+     * AYLIK GRUP
+     */
+
+    const grouped = {};
+
+
+    items.forEach(item => {
+
+      const month =
+        String(item.date || "")
+          .slice(0,7);
+
+      if(!month) return;
+
+      if(!grouped[month]){
+
+        grouped[month] = {
+          total:0,
+          count:0
+        };
+
+      }
+
+      grouped[month].total +=
+        Number(item.amount || 0);
+
+      grouped[month].count += 1;
+
+    });
+
+
+    const months =
+      Object.keys(grouped)
+        .sort()
+        .reverse();
+
+
+    /*
+     * İSTATİSTİKLER
+     */
+
+    totalValue.textContent =
+      money(total);
+
+    transactionCount.textContent =
+      items.length;
+
+
+    const monthTotals =
+      Object.values(grouped)
+        .map(x => x.total);
+
+
+    if(monthTotals.length){
+
+      const average =
+        monthTotals.reduce(
+          (a,b)=>a+b,
+          0
+        ) / monthTotals.length;
+
+      averageValue.textContent =
+        money(average);
+
+
+      let maxMonth =
+        months[0];
+
+      months.forEach(month => {
+
+        if(
+          grouped[month].total >
+          grouped[maxMonth].total
+        ){
+
+          maxMonth = month;
+
+        }
+
+      });
+
+
+      highestMonth.textContent =
+        monthName(maxMonth);
+
+    }else{
+
+      averageValue.textContent =
+        money(0);
+
+      highestMonth.textContent =
+        "-";
+
+    }
+
+
+    /*
+     * TABLO BAŞLIĞI
+     */
+
+    const typeText =
+      typeFilter.value === "Tümü"
+        ? "Tümü"
+        : typeFilter.value;
+
+    const categoryText =
+      categoryFilter.value === "Tümü"
+        ? "Tüm Kategoriler"
+        : categoryFilter.value;
+
+    const periodText =
+      periodFilter.value === "Tümü"
+        ? "Tüm Dönem"
+        : monthName(periodFilter.value);
+
+
+    tableSubtitle.textContent =
+      `${typeText} · ${categoryText} · ${periodText}`;
+
+
+    /*
+     * AYLIK TABLO
+     */
+
+    if(!months.length){
+
+      monthlyTable.innerHTML = "";
+
+      emptyBox.style.display =
+        "block";
+
+    }else{
+
+      emptyBox.style.display =
+        "none";
+
+      monthlyTable.innerHTML =
+        months.map(month => {
+
+          const row =
+            grouped[month];
+
+          return `
+            <tr>
+              <td>${escapeHtml(monthName(month))}</td>
+              <td class="amount">
+                ${money(row.total)}
+              </td>
+              <td>${row.count}</td>
+            </tr>
+          `;
+
+        }).join("");
+
+    }
+
+
+    /*
+     * İŞLEM TABLOSU
+     */
+
+    const sorted =
+      items
+        .slice()
+        .sort(
+          (a,b)=>
+            String(b.date || "")
+              .localeCompare(
+                String(a.date || "")
+              )
+        );
+
+
+    transactionsTable.innerHTML =
+      sorted.map(item => {
+
+        const typeClass =
+          item.type === "Gelir"
+            ? "income"
+            : item.type === "Gider"
+              ? "expense"
+              : "";
+
+
+        let dateText =
+          item.date || "-";
+
+
+        if(item.date){
+
+          const date =
+            new Date(
+              item.date +
+              "T00:00:00"
+            );
+
+          dateText =
+            date.toLocaleDateString(
+              "tr-TR"
+            );
+
+        }
+
+
+        return `
+          <tr>
+            <td>
+              ${escapeHtml(dateText)}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                item.description || "-"
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                item.category || "-"
+              )}
+            </td>
+
+            <td class="${typeClass}">
+              ${escapeHtml(
+                item.type || "-"
+              )}
+            </td>
+
+            <td class="amount ${typeClass}">
+              ${money(item.amount)}
+            </td>
+          </tr>
+        `;
+
+      }).join("");
+
+  }
+
+
+  /*
+   * =========================================================
+   * FİLTRE DEĞİŞİNCE
+   * =========================================================
+   */
+
+  typeFilter.addEventListener(
+    "change",
+    render
+  );
+
+  categoryFilter.addEventListener(
+    "change",
+    render
+  );
+
+  periodFilter.addEventListener(
+    "change",
+    render
+  );
+
+
+  /*
+   * =========================================================
+   * AUTH DURUMU
+   * =========================================================
+   */
+
+  onAuthStateChanged(
+    auth,
+    async user => {
+
+      clearError();
+
+
+      if(user){
+
+        userStatus.textContent =
+          `${user.displayName || "Kullanıcı"} — Firebase'e bağlı`;
+
+        loginBtn.style.display =
+          "none";
+
+        loginBox.style.display =
+          "none";
+
+        logoutBtn.style.display =
+          "inline-block";
+
+
+        await loadUserData(user);
+
+
+      }else{
+
+        userStatus.textContent =
+          "Firebase'e bağlı değil";
+
+        loginBtn.style.display =
+          "inline-block";
+
+        logoutBtn.style.display =
+          "none";
+
+        loadingBox.style.display =
+          "none";
+
+        reportArea.style.display =
+          "none";
+
+        loginBox.style.display =
+          "block";
+
+      }
+
+    }
+  );
 
 </script>
 
