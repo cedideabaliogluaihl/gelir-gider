@@ -1,24 +1,1033 @@
 <!doctype html>
 <html lang="tr">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#1f4e78"><link rel="manifest" href="manifest.json"><link rel="stylesheet" href="style.css"><title>Ayarlar - Gelir Gider V2.0</title></head>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f4e78">
+
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+
+<title>Ayarlar - Gelir Gider</title>
+
+<style>
+body{
+  background:#f5f7fa;
+}
+
+.firebase-bar{
+  position:sticky;
+  top:0;
+  z-index:9999;
+  background:#eef5fb;
+  border-bottom:1px solid #cbd9e6;
+  padding:9px 14px;
+  font:14px Arial,sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+
+.firebase-bar button{
+  border:0;
+  border-radius:7px;
+  padding:7px 12px;
+  background:#1f4e78;
+  color:#fff;
+  cursor:pointer;
+}
+
+.firebase-bar button.logout{
+  background:#fff;
+  color:#333;
+  border:1px solid #aaa;
+}
+
+.category-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.category-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 12px;
+  background:#fff;
+  border:1px solid #ddd;
+  border-radius:8px;
+}
+
+.category-item span{
+  font-weight:500;
+}
+
+.danger-outline{
+  border:1px solid #d9534f;
+  background:#fff;
+  color:#d9534f;
+  border-radius:6px;
+  padding:5px 10px;
+  cursor:pointer;
+}
+
+.add-category{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.add-category input{
+  flex:1;
+}
+
+.settings-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+}
+
+.setting-card{
+  background:#fff;
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:15px;
+}
+
+.setting-card h3{
+  margin-top:0;
+}
+
+@media(max-width:800px){
+  .settings-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
 <body>
-<header><div><h1>Ayarlar</h1><div class="sub">Sabit bilgileri burada yönet</div></div><a class="ghost link-btn" href="index.html">← Ana Sayfa</a></header>
+
+<header>
+  <div>
+    <h1>Ayarlar</h1>
+    <div class="sub">Sabit bilgileri burada yönet</div>
+  </div>
+
+  <a class="ghost link-btn" href="index.html">
+    ← Ana Sayfa
+  </a>
+</header>
+
 <main>
-<section class="panel"><div class="panel-head"><h2>Kredi Kartları</h2><span class="muted">Kart adı ve limiti</span></div>
-<div class="settings-grid">
-<div class="setting-card"><h3>Kart 1</h3><label>Kart adı<input id="cardName1" placeholder="Örn. Troy Türkiye Finans"></label><label>Kart limiti<input id="cardLimit1" type="number" min="0" step="0.01"></label></div>
-<div class="setting-card"><h3>Kart 2</h3><label>Kart adı<input id="cardName2" placeholder="Örn. Troy Yapı Kredi"></label><label>Kart limiti<input id="cardLimit2" type="number" min="0" step="0.01"></label></div>
-<div class="setting-card"><h3>Kart 3</h3><label>Kart adı<input id="cardName3" placeholder="Örn. Kuveyt Türk"></label><label>Kart limiti<input id="cardLimit3" type="number" min="0" step="0.01"></label></div>
-</div><button id="saveCardsBtn" class="primary">Kart Ayarlarını Kaydet</button></section>
-<section class="panel"><div class="panel-head"><h2>Gelir Kategorileri</h2><span class="muted">Örn. Maaş, Ek Ders</span></div>
-<div id="incomeCategories" class="category-list"></div>
-<div class="add-category"><input id="newIncomeCategory" placeholder="Yeni gelir kategorisi"><button id="addIncomeCategoryBtn" class="primary">+ Ekle</button></div></section>
 
-<section class="panel"><div class="panel-head"><h2>Gider Kategorileri</h2><span class="muted">Örn. Kira, Market, Fatura</span></div>
-<div id="expenseCategories" class="category-list"></div>
-<div class="add-category"><input id="newExpenseCategory" placeholder="Yeni gider kategorisi"><button id="addExpenseCategoryBtn" class="primary">+ Ekle</button></div></section>
+<section class="panel">
 
-<section class="panel"><h2>Not</h2><p class="note">Ayarları değiştirmen mevcut işlemleri silmez. Eski kayıtlar korunur; raporlarda geçmişe dönük görünmeye devam eder.</p></section>
+  <div class="panel-head">
+    <h2>Kredi Kartları</h2>
+    <span class="muted">Kart adı ve limiti</span>
+  </div>
+
+  <div class="settings-grid">
+
+    <div class="setting-card">
+      <h3>Kart 1</h3>
+
+      <label>
+        Kart adı
+        <input id="cardName1" placeholder="Örn. Troy Türkiye Finans">
+      </label>
+
+      <label>
+        Kart limiti
+        <input id="cardLimit1" type="number" min="0" step="0.01">
+      </label>
+    </div>
+
+    <div class="setting-card">
+      <h3>Kart 2</h3>
+
+      <label>
+        Kart adı
+        <input id="cardName2" placeholder="Örn. Troy Yapı Kredi">
+      </label>
+
+      <label>
+        Kart limiti
+        <input id="cardLimit2" type="number" min="0" step="0.01">
+      </label>
+    </div>
+
+    <div class="setting-card">
+      <h3>Kart 3</h3>
+
+      <label>
+        Kart adı
+        <input id="cardName3" placeholder="Örn. Kuveyt Türk">
+      </label>
+
+      <label>
+        Kart limiti
+        <input id="cardLimit3" type="number" min="0" step="0.01">
+      </label>
+    </div>
+
+  </div>
+
+  <button id="saveCardsBtn" class="primary">
+    Kart Ayarlarını Kaydet
+  </button>
+
+</section>
+
+
+<section class="panel">
+
+  <div class="panel-head">
+    <h2>Gelir Kategorileri</h2>
+    <span class="muted">Örn. Maaş, Ek Ders</span>
+  </div>
+
+  <div id="incomeCategories" class="category-list"></div>
+
+  <div class="add-category">
+
+    <input
+      id="newIncomeCategory"
+      placeholder="Yeni gelir kategorisi"
+    >
+
+    <button
+      id="addIncomeCategoryBtn"
+      class="primary"
+    >
+      + Ekle
+    </button>
+
+  </div>
+
+</section>
+
+
+<section class="panel">
+
+  <div class="panel-head">
+    <h2>Gider Kategorileri</h2>
+    <span class="muted">Örn. Kira, Market, Fatura</span>
+  </div>
+
+  <div id="expenseCategories" class="category-list"></div>
+
+  <div class="add-category">
+
+    <input
+      id="newExpenseCategory"
+      placeholder="Yeni gider kategorisi"
+    >
+
+    <button
+      id="addExpenseCategoryBtn"
+      class="primary"
+    >
+      + Ekle
+    </button>
+
+  </div>
+
+</section>
+
+
+<section class="panel">
+
+  <h2>Not</h2>
+
+  <p class="note">
+    Ayarları değiştirmen mevcut işlemleri silmez.
+    Eski kayıtlar korunur ve raporlarda geçmişe dönük görünmeye devam eder.
+  </p>
+
+</section>
+
 </main>
-<script type="module" src="settings.js?v=14"></script>
-</body></html>
+
+
+<script type="module">
+
+/* =========================================================
+   FIREBASE
+   ========================================================= */
+
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+
+/* =========================================================
+   SENİN FIREBASE CONSOLE'DAKİ DOĞRU CONFIG
+   ========================================================= */
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyC8Pk7DCPwmb5RK2NQCBPEv692-lzeeo4c",
+
+  authDomain:
+    "gelir-gider-546b4.firebaseapp.com",
+
+  projectId:
+    "gelir-gider-546b4",
+
+  storageBucket:
+    "gelir-gider-546b4.firebasestorage.app",
+
+  messagingSenderId:
+    "682384311790",
+
+  appId:
+    "1:682384311790:web:2ba8621cec98145232faff"
+};
+
+
+/* =========================================================
+   FIREBASE BAŞLAT
+   ========================================================= */
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+const provider = new GoogleAuthProvider();
+
+provider.setCustomParameters({
+  prompt:"select_account"
+});
+
+
+/* =========================================================
+   VARSAYILAN AYARLAR
+   ========================================================= */
+
+const defaults = {
+
+  cards:[
+    {
+      name:"Kart 1",
+      limit:0
+    },
+    {
+      name:"Kart 2",
+      limit:0
+    },
+    {
+      name:"Kart 3",
+      limit:0
+    }
+  ],
+
+  incomeCategories:[
+    "Maaş",
+    "Ek Ders",
+    "Diğer Gelir"
+  ],
+
+  expenseCategories:[
+    "Kira",
+    "Market",
+    "Fatura",
+    "Yakıt",
+    "Nakit",
+    "Diğer Gider"
+  ]
+
+};
+
+
+/* =========================================================
+   GLOBAL
+   ========================================================= */
+
+let settings = null;
+
+let currentUser = null;
+
+
+/* =========================================================
+   HTML KISAYOL
+   ========================================================= */
+
+const $ = id =>
+  document.getElementById(id);
+
+
+/* =========================================================
+   AUTH BAR
+   ========================================================= */
+
+function createAuthBar(){
+
+  const bar =
+    document.createElement("div");
+
+  bar.className =
+    "firebase-bar";
+
+  bar.innerHTML = `
+
+    <span id="firebaseUserText">
+      Firebase bağlantısı hazırlanıyor...
+    </span>
+
+    <button
+      id="loginBtn"
+      style="display:none"
+    >
+      Google ile giriş yap
+    </button>
+
+    <button
+      id="logoutBtn"
+      class="logout"
+      style="display:none"
+    >
+      Çıkış Yap
+    </button>
+
+  `;
+
+  document.body.prepend(bar);
+
+
+  $("loginBtn").onclick = async () => {
+
+    try{
+
+      await signInWithPopup(
+        auth,
+        provider
+      );
+
+    }catch(error){
+
+      showError(error);
+
+    }
+
+  };
+
+
+  $("logoutBtn").onclick = async () => {
+
+    await signOut(auth);
+
+  };
+
+}
+
+
+/* =========================================================
+   AUTH HATA
+   ========================================================= */
+
+function showError(error){
+
+  console.error(error);
+
+  const text =
+    error?.code ||
+    error?.message ||
+    "Bilinmeyen hata";
+
+  $("firebaseUserText").textContent =
+    "Giriş başarısız: " + text;
+
+}
+
+
+/* =========================================================
+   AUTH DURUMU
+   ========================================================= */
+
+function waitForLogin(){
+
+  return new Promise(resolve => {
+
+    onAuthStateChanged(
+      auth,
+      user => {
+
+        currentUser = user;
+
+
+        if(user){
+
+          $("firebaseUserText").textContent =
+            "☁️ " +
+            (user.displayName ||
+             user.email ||
+             "Google hesabı") +
+            " — Firebase'e bağlı";
+
+          $("loginBtn").style.display =
+            "none";
+
+          $("logoutBtn").style.display =
+            "inline-block";
+
+          resolve(user);
+
+        }else{
+
+          $("firebaseUserText").textContent =
+            "Firebase'e giriş yapılmadı.";
+
+          $("loginBtn").style.display =
+            "inline-block";
+
+          $("logoutBtn").style.display =
+            "none";
+
+        }
+
+      }
+    );
+
+  });
+
+}
+
+
+/* =========================================================
+   AYARLARI NORMALLEŞTİR
+   ========================================================= */
+
+function normalizeSettings(data){
+
+  data =
+    data &&
+    typeof data === "object"
+      ? data
+      : {};
+
+
+  const cards =
+    Array.isArray(data.cards) &&
+    data.cards.length === 3
+      ? data.cards
+      : defaults.cards;
+
+
+  return {
+
+    cards:
+
+      cards.map((card,i) => ({
+
+        name:
+          String(
+            card?.name ||
+            "Kart " + (i+1)
+          ),
+
+        limit:
+          Number(card?.limit) || 0
+
+      })),
+
+    incomeCategories:
+
+      Array.isArray(
+        data.incomeCategories
+      ) &&
+      data.incomeCategories.length
+
+        ? data.incomeCategories.map(String)
+
+        : [...defaults.incomeCategories],
+
+
+    expenseCategories:
+
+      Array.isArray(
+        data.expenseCategories
+      ) &&
+      data.expenseCategories.length
+
+        ? data.expenseCategories.map(String)
+
+        : [...defaults.expenseCategories]
+
+  };
+
+}
+
+
+/* =========================================================
+   FIRESTORE'DAN AYARLARI AL
+   ========================================================= */
+
+async function loadSettings(){
+
+  const ref =
+    doc(
+      db,
+      "users",
+      currentUser.uid
+    );
+
+
+  const snap =
+    await getDoc(ref);
+
+
+  if(snap.exists()){
+
+    const data =
+      snap.data();
+
+
+    settings =
+      normalizeSettings(
+        data.settings
+      );
+
+  }else{
+
+    settings =
+      normalizeSettings(
+        defaults
+      );
+
+
+    await setDoc(
+      ref,
+      {
+        settings,
+        createdAt:
+          serverTimestamp(),
+        updatedAt:
+          serverTimestamp()
+      },
+      {
+        merge:true
+      }
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   FIRESTORE'A AYAR KAYDET
+   ========================================================= */
+
+async function saveSettings(){
+
+  if(!currentUser){
+
+    throw new Error(
+      "Firebase oturumu yok."
+    );
+
+  }
+
+
+  settings =
+    normalizeSettings(
+      settings
+    );
+
+
+  await setDoc(
+
+    doc(
+      db,
+      "users",
+      currentUser.uid
+    ),
+
+    {
+      settings,
+
+      updatedAt:
+        serverTimestamp()
+
+    },
+
+    {
+      merge:true
+    }
+
+  );
+
+}
+
+
+/* =========================================================
+   KATEGORİLERİ ÇİZ
+   ========================================================= */
+
+function drawCategories(
+  elementId,
+  array
+){
+
+  const element =
+    $(elementId);
+
+
+  element.innerHTML =
+    array.map(
+      (item,index) => `
+
+        <div class="category-item">
+
+          <span>
+            ${escapeHtml(item)}
+          </span>
+
+          ${
+            array.length > 1
+
+              ? `
+                <button
+                  type="button"
+                  class="danger-outline"
+                  data-index="${index}"
+                >
+                  Sil
+                </button>
+              `
+
+              : ""
+          }
+
+        </div>
+
+      `
+    ).join("");
+
+
+  element
+    .querySelectorAll(
+      ".danger-outline"
+    )
+    .forEach(button => {
+
+      button.onclick =
+        async () => {
+
+          const index =
+            Number(
+              button.dataset.index
+            );
+
+
+          array.splice(
+            index,
+            1
+          );
+
+
+          try{
+
+            await saveSettings();
+
+            drawCategories(
+              elementId,
+              array
+            );
+
+          }catch(error){
+
+            alert(
+              "Kaydedilemedi: " +
+              error.message
+            );
+
+          }
+
+        };
+
+    });
+
+}
+
+
+/* =========================================================
+   HTML ESCAPE
+   ========================================================= */
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(
+      /[&<>"']/g,
+      char => ({
+
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+
+      }[char])
+    );
+
+}
+
+
+/* =========================================================
+   EKRANI DOLDUR
+   ========================================================= */
+
+function render(){
+
+  for(
+    let i=1;
+    i<=3;
+    i++
+  ){
+
+    const card =
+      settings.cards[i-1];
+
+
+    $("cardName"+i).value =
+      card.name ||
+      "Kart "+i;
+
+
+    $("cardLimit"+i).value =
+      card.limit || "";
+
+  }
+
+
+  drawCategories(
+    "incomeCategories",
+    settings.incomeCategories
+  );
+
+
+  drawCategories(
+    "expenseCategories",
+    settings.expenseCategories
+  );
+
+}
+
+
+/* =========================================================
+   KART KAYDET
+   ========================================================= */
+
+$("saveCardsBtn").onclick =
+  async () => {
+
+    try{
+
+      settings.cards =
+        [1,2,3].map(i => ({
+
+          name:
+            $("cardName"+i)
+              .value
+              .trim() ||
+            "Kart "+i,
+
+          limit:
+            Number(
+              $("cardLimit"+i).value
+            ) || 0
+
+        }));
+
+
+      await saveSettings();
+
+
+      alert(
+        "Kart ayarları kaydedildi."
+      );
+
+
+    }catch(error){
+
+      alert(
+        "Kaydedilemedi: " +
+        error.message
+      );
+
+    }
+
+  };
+
+
+/* =========================================================
+   GELİR KATEGORİSİ EKLE
+   ========================================================= */
+
+$("addIncomeCategoryBtn").onclick =
+  async () => {
+
+    const input =
+      $("newIncomeCategory");
+
+
+    const value =
+      input.value.trim();
+
+
+    if(
+      !value ||
+      settings.incomeCategories
+        .includes(value)
+    ){
+
+      return;
+
+    }
+
+
+    settings.incomeCategories
+      .push(value);
+
+
+    try{
+
+      await saveSettings();
+
+      drawCategories(
+        "incomeCategories",
+        settings.incomeCategories
+      );
+
+      input.value = "";
+
+    }catch(error){
+
+      alert(
+        "Kaydedilemedi: " +
+        error.message
+      );
+
+    }
+
+  };
+
+
+/* =========================================================
+   GİDER KATEGORİSİ EKLE
+   ========================================================= */
+
+$("addExpenseCategoryBtn").onclick =
+  async () => {
+
+    const input =
+      $("newExpenseCategory");
+
+
+    const value =
+      input.value.trim();
+
+
+    if(
+      !value ||
+      settings.expenseCategories
+        .includes(value)
+    ){
+
+      return;
+
+    }
+
+
+    settings.expenseCategories
+      .push(value);
+
+
+    try{
+
+      await saveSettings();
+
+      drawCategories(
+        "expenseCategories",
+        settings.expenseCategories
+      );
+
+      input.value = "";
+
+    }catch(error){
+
+      alert(
+        "Kaydedilemedi: " +
+        error.message
+      );
+
+    }
+
+  };
+
+
+/* =========================================================
+   BAŞLAT
+   ========================================================= */
+
+async function main(){
+
+  createAuthBar();
+
+
+  await waitForLogin();
+
+
+  if(!currentUser){
+
+    return;
+
+  }
+
+
+  await loadSettings();
+
+
+  render();
+
+}
+
+
+main().catch(error => {
+
+  console.error(error);
+
+  $("firebaseUserText").textContent =
+    "Firebase bağlantı hatası: " +
+    error.message;
+
+});
+
+</script>
+
+</body>
+</html>
