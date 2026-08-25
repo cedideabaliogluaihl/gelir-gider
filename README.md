@@ -1,10 +1,7 @@
-# Gelir-Gider V1.3
+# Gelir-Gider V1.5
 
-- Ana ekran sadece güncel ayı gösterir.
-- Eski kayıtlar `gelirGiderV4` localStorage anahtarında korunur.
-- Geçmiş ve kategori raporları `reports.html` sayfasındadır.
-- Kredi kartı taksitleri `installments.html` sayfasındadır.
-- Kart ve kategori sabitleri `settings.html` sayfasındadır.
-
-
-V1.4: Eski kategorisiz kayıtlar Raporlar sayfasında tek tek kategorilendirilebilir. Mevcut kayıtlar silinmez.
+- Eski kategorisiz kayıtlar korunur.
+- Raporlar'da "Kategorisiz Eski Kayıtlar" filtresi ile eski kayıtlar tek tek kategorilendirilebilir.
+- Maaş / Ek Ders / Kira gibi kategori raporları kategori atandıktan sonra çalışır.
+- Yeni Gelir/Gider kayıtlarında kategori zorunludur.
+- Ana ekran yalnızca güncel ayı gösterir.

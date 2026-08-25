@@ -111,6 +111,7 @@ $("form").onsubmit=e=>{
   const description=$("description").value.trim();
   if(!description)return alert("Açıklama gir.");
   if(!amount||amount<=0)return alert("Geçerli tutar gir.");
+  if((type==="Gelir"||type==="Gider")&&!$("category").value)return alert("Kategori seç.");
   if(payment==="Kredi Kartı"&&!card)return alert("Kart seç.");
   const count=payment==="Kredi Kartı"&&$("installment").checked?Number($("installmentCount").value)||1:1;
   items.push({
