@@ -1,6 +1,10 @@
 const KEY = "gelirGiderV4";
 const SET = "gelirGiderSettingsV1";
 
+/* =========================================================
+   FIREBASE AYARLARI
+========================================================= */
+
 const firebaseConfig = {
   apiKey: "AIzaSyC8Pk7DCPwmb5RK2NQCBPEv692-lzeeo4c",
   authDomain: "gelir-gider-546b4.firebaseapp.com",
@@ -10,792 +14,1691 @@ const firebaseConfig = {
   appId: "1:682384311790:web:2ba8621cec98145232faff"
 };
 
+/* Firebase SDK sürümü */
+const FB_VERSION = "12.16.0";
+
+
+/* =========================================================
+   UYGULAMA VERİLERİ
+========================================================= */
+
 let items = [];
+
 let settings = {
   cards: [
-    {name:"Kart 1",limit:0},
-    {name:"Kart 2",limit:0},
-    {name:"Kart 3",limit:0}
+    { name: "Kart 1", limit: 0 },
+    { name: "Kart 2", limit: 0 },
+    { name: "Kart 3", limit: 0 }
   ],
-  incomeCategories:["Maaş","Ek Ders","Diğer Gelir"],
-  expenseCategories:["Kira","Market","Fatura","Yakıt","Nakit","Diğer Gider"]
+
+  incomeCategories: [
+    "Maaş",
+    "Ek Ders",
+    "Diğer Gelir"
+  ],
+
+  expenseCategories: [
+    "Kira",
+    "Market",
+    "Fatura",
+    "Yakıt",
+    "Nakit",
+    "Diğer Gider"
+  ]
 };
+
+
+/* =========================================================
+   FIREBASE DEĞİŞKENLERİ
+========================================================= */
 
 let firebaseReady = false;
 let currentUser = null;
-let db = null;
+
+let firebaseApp = null;
 let auth = null;
+let db = null;
+
+
+/* =========================================================
+   KISA FONKSİYONLAR
+========================================================= */
 
 const $ = id => document.getElementById(id);
 
+
 const money = n =>
   new Intl.NumberFormat("tr-TR", {
-    style:"currency",
-    currency:"TRY",
-    maximumFractionDigits:2
-  }).format(n);
+    style: "currency",
+    currency: "TRY",
+    maximumFractionDigits: 2
+  }).format(Number(n) || 0);
+
 
 const esc = s =>
-  String(s ?? "").replace(/[&<>"']/g,m=>({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#039;"
+  String(s ?? "").replace(/[&<>"']/g, m => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
   }[m]));
 
-function localLoad(){
-  try{
-    items = JSON.parse(localStorage.getItem(KEY) || "[]");
-    settings = JSON.parse(
-      localStorage.getItem(SET) || JSON.stringify(settings)
+
+/* =========================================================
+   LOCAL STORAGE
+========================================================= */
+
+function loadLocal() {
+
+  try {
+
+    items = JSON.parse(
+      localStorage.getItem(KEY) || "[]"
     );
-  }catch{}
 
-  if(!Array.isArray(items)) items=[];
+    settings = JSON.parse(
+      localStorage.getItem(SET) ||
+      JSON.stringify(settings)
+    );
 
-  if(!settings.cards || settings.cards.length!==3){
-    settings.cards=[
-      {name:"Kart 1",limit:0},
-      {name:"Kart 2",limit:0},
-      {name:"Kart 3",limit:0}
+  } catch (error) {
+
+    console.error(
+      "Local kayıt okunamadı:",
+      error
+    );
+
+    items = [];
+
+    settings = {
+      cards: [
+        { name: "Kart 1", limit: 0 },
+        { name: "Kart 2", limit: 0 },
+        { name: "Kart 3", limit: 0 }
+      ],
+
+      incomeCategories: [
+        "Maaş",
+        "Ek Ders",
+        "Diğer Gelir"
+      ],
+
+      expenseCategories: [
+        "Kira",
+        "Market",
+        "Fatura",
+        "Yakıt",
+        "Nakit",
+        "Diğer Gider"
+      ]
+    };
+  }
+
+
+  if (!Array.isArray(items)) {
+    items = [];
+  }
+
+
+  if (
+    !Array.isArray(settings.cards) ||
+    settings.cards.length !== 3
+  ) {
+
+    settings.cards = [
+      { name: "Kart 1", limit: 0 },
+      { name: "Kart 2", limit: 0 },
+      { name: "Kart 3", limit: 0 }
     ];
   }
 
-  if(!Array.isArray(settings.incomeCategories) ||
-     !settings.incomeCategories.length){
-    settings.incomeCategories=["Maaş","Ek Ders","Diğer Gelir"];
+
+  if (
+    !Array.isArray(settings.incomeCategories) ||
+    settings.incomeCategories.length === 0
+  ) {
+
+    settings.incomeCategories = [
+      "Maaş",
+      "Ek Ders",
+      "Diğer Gelir"
+    ];
   }
 
-  if(!Array.isArray(settings.expenseCategories) ||
-     !settings.expenseCategories.length){
-    settings.expenseCategories=[
-      "Kira","Market","Fatura","Yakıt","Nakit","Diğer Gider"
+
+  if (
+    !Array.isArray(settings.expenseCategories) ||
+    settings.expenseCategories.length === 0
+  ) {
+
+    settings.expenseCategories = [
+      "Kira",
+      "Market",
+      "Fatura",
+      "Yakıt",
+      "Nakit",
+      "Diğer Gider"
     ];
   }
 }
 
-function localSave(){
-  localStorage.setItem(KEY,JSON.stringify(items));
-  localStorage.setItem(SET,JSON.stringify(settings));
+
+function saveLocal() {
+
+  localStorage.setItem(
+    KEY,
+    JSON.stringify(items)
+  );
+
+  localStorage.setItem(
+    SET,
+    JSON.stringify(settings)
+  );
 }
 
-function isCard(x){
-  return x.type==="Gider" &&
-         x.payment==="Kredi Kartı" &&
-         x.card?.startsWith("c");
+
+/* =========================================================
+   KREDİ KARTI / TAKSİT HESAPLARI
+========================================================= */
+
+function isCard(x) {
+
+  return (
+    x.type === "Gider" &&
+    x.payment === "Kredi Kartı" &&
+    typeof x.card === "string" &&
+    x.card.startsWith("c")
+  );
 }
 
-function installments(x){
-  return Math.max(1,Number(x.installments)||1);
+
+function installments(x) {
+
+  return Math.max(
+    1,
+    Number(x.installments) || 1
+  );
 }
 
-function ym(d){
-  return String(d).slice(0,7);
+
+function ym(date) {
+
+  return String(date).slice(0, 7);
 }
 
-function due(x,m){
-  if(!isCard(x)) return 0;
 
-  const s=ym(x.date);
+function due(x, month) {
+
+  if (!isCard(x)) {
+    return 0;
+  }
+
+
+  const startMonth = ym(x.date);
 
   const diff =
-    (+m.slice(0,4)-+s.slice(0,4))*12 +
-    (+m.slice(5)-+s.slice(5));
+    (
+      Number(month.slice(0, 4)) -
+      Number(startMonth.slice(0, 4))
+    ) * 12
+    +
+    (
+      Number(month.slice(5)) -
+      Number(startMonth.slice(5))
+    );
 
-  return diff>=0 && diff<installments(x)
-    ? x.amount/installments(x)
-    : 0;
+
+  if (
+    diff >= 0 &&
+    diff < installments(x)
+  ) {
+
+    return (
+      Number(x.amount) /
+      installments(x)
+    );
+  }
+
+
+  return 0;
 }
 
-function currentMonth(){
-  return new Date().toISOString().slice(0,7);
+
+/* =========================================================
+   TARİH
+========================================================= */
+
+function currentMonth() {
+
+  return new Date()
+    .toISOString()
+    .slice(0, 7);
 }
 
-function monthLabel(m){
-  return new Date(m+"-01T00:00:00")
-    .toLocaleDateString("tr-TR",{
-      month:"long",
-      year:"numeric"
-    });
+
+function monthLabel(month) {
+
+  return new Date(
+    month + "-01T00:00:00"
+  ).toLocaleDateString(
+    "tr-TR",
+    {
+      month: "long",
+      year: "numeric"
+    }
+  );
 }
 
-function populateCategories(){
-  const type=$("type")?.value;
-  const sel=$("category");
 
-  if(!sel) return;
+/* =========================================================
+   KATEGORİLER
+========================================================= */
 
-  if(type==="Kasa Transferi"){
-    sel.innerHTML="<option>Kasa Transferi</option>";
+function populateCategories() {
+
+  const type = $("type")?.value;
+
+  const select = $("category");
+
+  if (!select) {
     return;
   }
 
-  const arr =
-    type==="Gelir"
+
+  if (type === "Kasa Transferi") {
+
+    select.innerHTML =
+      `<option value="Kasa Transferi">
+        Kasa Transferi
+      </option>`;
+
+    return;
+  }
+
+
+  const categories =
+    type === "Gelir"
       ? settings.incomeCategories
       : settings.expenseCategories;
 
-  sel.innerHTML =
-    arr.map(x=>`<option>${esc(x)}</option>`).join("");
+
+  select.innerHTML =
+    categories
+      .map(
+        category =>
+          `<option value="${esc(category)}">
+            ${esc(category)}
+          </option>`
+      )
+      .join("");
 }
 
-function render(){
 
-  const m=currentMonth();
-  const label=monthLabel(m);
+/* =========================================================
+   ANA EKRAN
+========================================================= */
 
-  const current =
-    items.filter(x=>x.date?.startsWith(m));
+function render() {
+
+  const month = currentMonth();
+
+  const label = monthLabel(month);
+
+
+  const currentItems =
+    items.filter(
+      x =>
+        x.date &&
+        x.date.startsWith(month)
+    );
+
+
+  /* GELİR */
 
   const income =
-    current
-      .filter(x=>x.type==="Gelir")
-      .reduce((s,x)=>s+x.amount,0);
-
-  const cashExpense =
-    current
-      .filter(x=>x.type==="Gider" && !isCard(x))
-      .reduce((s,x)=>s+x.amount,0);
-
-  const cardExpense =
-    items.reduce((s,x)=>s+due(x,m),0);
-
-  const expense=cashExpense+cardExpense;
-
-  const transfer =
-    current
-      .filter(x=>x.type==="Kasa Transferi")
-      .reduce((s,x)=>s+x.amount,0);
-
-  if($("totalIncome"))
-    $("totalIncome").textContent=money(income);
-
-  if($("totalExpense"))
-    $("totalExpense").textContent=money(expense);
-
-  if($("net"))
-    $("net").textContent=money(income-expense-transfer);
-
-  if($("totalTransfer"))
-    $("totalTransfer").textContent=money(transfer);
-
-  if($("currentMonthLabel"))
-    $("currentMonthLabel").textContent=label;
-
-  if($("transactionsTitle"))
-    $("transactionsTitle").textContent=`${label} İşlemleri`;
-
-  if($("cardSummary")){
-    $("cardSummary").innerHTML =
-      settings.cards.map((c,i)=>{
-
-        const value =
-          items.reduce(
-            (s,x)=>
-              s+due(x,m)*(x.card==="c"+i),
-            0
-          );
-
-        const limit=Number(c.limit)||0;
-        const remaining=limit-value;
-
-        return `
-        <div>
-          <span>${esc(c.name)}</span>
-          <strong>${money(value)}</strong>
-          <small>Bu ay harcama</small>
-          <small>
-            Limit: ${money(limit)}
-            · Kalan: ${money(remaining)}
-          </small>
-        </div>`;
-      }).join("");
-  }
-
-  if($("monthIncome"))
-    $("monthIncome").textContent=money(income);
-
-  if($("monthExpense"))
-    $("monthExpense").textContent=money(expense);
-
-  if($("monthNet"))
-    $("monthNet").textContent=money(income-expense-transfer);
-
-  if($("monthTransfer"))
-    $("monthTransfer").textContent=money(transfer);
-
-  const sorted =
-    current
-      .slice()
-      .sort((a,b)=>
-        b.date.localeCompare(a.date) ||
-        (b.id-a.id)
+    currentItems
+      .filter(
+        x => x.type === "Gelir"
+      )
+      .reduce(
+        (sum, x) =>
+          sum + Number(x.amount || 0),
+        0
       );
 
-  if($("list")){
-    $("list").innerHTML =
-      sorted.map(x=>`
 
-      <tr class="${
-        x.type==="Gelir"
-          ?"income"
-          :x.type==="Gider"
-            ?"expense"
-            :"transfer"
-      }">
+  /* NAKİT GİDER */
 
-        <td>
-          <input
-            class="sel"
-            type="checkbox"
-            data-id="${x.id}">
-        </td>
+  const cashExpense =
+    currentItems
+      .filter(
+        x =>
+          x.type === "Gider" &&
+          !isCard(x)
+      )
+      .reduce(
+        (sum, x) =>
+          sum + Number(x.amount || 0),
+        0
+      );
 
-        <td>
-          ${new Date(
-            x.date+"T00:00:00"
-          ).toLocaleDateString("tr-TR")}
-        </td>
 
-        <td>${esc(x.description)}</td>
+  /* KREDİ KARTI GİDER */
 
-        <td>${esc(x.category||"Genel")}</td>
+  const cardExpense =
+    items.reduce(
+      (sum, x) =>
+        sum + due(x, month),
+      0
+    );
 
-        <td>${esc(x.type)}</td>
 
-        <td>${esc(x.payment||"-")}</td>
+  const expense =
+    cashExpense +
+    cardExpense;
 
-        <td>
-          ${
-            isCard(x)
-              ? esc(
-                  settings.cards[
-                    +x.card.slice(1)
-                  ]?.name || "-"
-                )
-              : "-"
-          }
-        </td>
 
-        <td>
-          ${
-            isCard(x)
-              ? installments(x)>1
-                ? installments(x)+" taksit"
-                : "Tek çekim"
-              : "-"
-          }
-        </td>
+  /* KASA TRANSFERİ */
 
-        <td class="amount">
-          ${money(
-            isCard(x)
-              ? x.amount/installments(x)
-              : x.amount
-          )}
-        </td>
+  const transfer =
+    currentItems
+      .filter(
+        x =>
+          x.type ===
+          "Kasa Transferi"
+      )
+      .reduce(
+        (sum, x) =>
+          sum + Number(x.amount || 0),
+        0
+      );
 
-      </tr>
-      `).join("");
+
+  /* ÖZET */
+
+  if ($("totalIncome")) {
+
+    $("totalIncome").textContent =
+      money(income);
   }
 
-  if($("empty"))
+
+  if ($("totalExpense")) {
+
+    $("totalExpense").textContent =
+      money(expense);
+  }
+
+
+  if ($("net")) {
+
+    $("net").textContent =
+      money(
+        income -
+        expense -
+        transfer
+      );
+  }
+
+
+  if ($("totalTransfer")) {
+
+    $("totalTransfer").textContent =
+      money(transfer);
+  }
+
+
+  if ($("currentMonthLabel")) {
+
+    $("currentMonthLabel").textContent =
+      label;
+  }
+
+
+  if ($("transactionsTitle")) {
+
+    $("transactionsTitle").textContent =
+      `${label} İşlemleri`;
+  }
+
+
+  /* =====================================================
+     KREDİ KARTI ÖZETİ
+  ===================================================== */
+
+  if ($("cardSummary")) {
+
+    $("cardSummary").innerHTML =
+      settings.cards
+        .map((card, index) => {
+
+          const cardValue =
+            items.reduce(
+              (sum, x) => {
+
+                if (
+                  x.card !==
+                  "c" + index
+                ) {
+
+                  return sum;
+                }
+
+                return (
+                  sum +
+                  due(x, month)
+                );
+              },
+              0
+            );
+
+
+          const limit =
+            Number(card.limit) || 0;
+
+
+          const remaining =
+            limit -
+            cardValue;
+
+
+          return `
+            <div>
+
+              <span>
+                ${esc(card.name)}
+              </span>
+
+              <strong>
+                ${money(cardValue)}
+              </strong>
+
+              <small>
+                Bu ay harcama
+              </small>
+
+              <small>
+                Limit:
+                ${money(limit)}
+                · Kalan:
+                ${money(remaining)}
+              </small>
+
+            </div>
+          `;
+
+        })
+        .join("");
+  }
+
+
+  /* =====================================================
+     AYLIK ÖZET
+  ===================================================== */
+
+  if ($("monthIncome")) {
+
+    $("monthIncome").textContent =
+      money(income);
+  }
+
+
+  if ($("monthExpense")) {
+
+    $("monthExpense").textContent =
+      money(expense);
+  }
+
+
+  if ($("monthNet")) {
+
+    $("monthNet").textContent =
+      money(
+        income -
+        expense -
+        transfer
+      );
+  }
+
+
+  if ($("monthTransfer")) {
+
+    $("monthTransfer").textContent =
+      money(transfer);
+  }
+
+
+  /* =====================================================
+     İŞLEMLER
+  ===================================================== */
+
+  const sorted =
+    currentItems
+      .slice()
+      .sort(
+        (a, b) =>
+          String(b.date)
+            .localeCompare(
+              String(a.date)
+            )
+          ||
+          (
+            Number(b.id) -
+            Number(a.id)
+          )
+      );
+
+
+  if ($("list")) {
+
+    $("list").innerHTML =
+      sorted
+        .map(x => {
+
+          const rowClass =
+            x.type === "Gelir"
+              ? "income"
+              : x.type === "Gider"
+                ? "expense"
+                : "transfer";
+
+
+          const cardName =
+            isCard(x)
+              ? (
+                  settings.cards[
+                    Number(
+                      x.card
+                        .slice(1)
+                    )
+                  ]?.name ||
+                  "-"
+                )
+              : "-";
+
+
+          const installmentText =
+            isCard(x)
+              ? (
+                  installments(x) > 1
+                    ? installments(x) +
+                      " taksit"
+                    : "Tek çekim"
+                )
+              : "-";
+
+
+          const displayAmount =
+            isCard(x)
+              ? (
+                  Number(x.amount) /
+                  installments(x)
+                )
+              : Number(x.amount);
+
+
+          return `
+            <tr class="${rowClass}">
+
+              <td>
+                <input
+                  class="sel"
+                  type="checkbox"
+                  data-id="${x.id}">
+              </td>
+
+              <td>
+                ${
+                  new Date(
+                    x.date +
+                    "T00:00:00"
+                  ).toLocaleDateString(
+                    "tr-TR"
+                  )
+                }
+              </td>
+
+              <td>
+                ${esc(x.description)}
+              </td>
+
+              <td>
+                ${esc(
+                  x.category ||
+                  "Genel"
+                )}
+              </td>
+
+              <td>
+                ${esc(x.type)}
+              </td>
+
+              <td>
+                ${esc(
+                  x.payment ||
+                  "-"
+                )}
+              </td>
+
+              <td>
+                ${esc(cardName)}
+              </td>
+
+              <td>
+                ${esc(
+                  installmentText
+                )}
+              </td>
+
+              <td class="amount">
+                ${money(displayAmount)}
+              </td>
+
+            </tr>
+          `;
+
+        })
+        .join("");
+  }
+
+
+  if ($("empty")) {
+
     $("empty").style.display =
-      sorted.length ? "none" : "block";
+      sorted.length
+        ? "none"
+        : "block";
+  }
 }
 
-function sync(){
 
-  if(!$("type")) return;
+/* =========================================================
+   FORM GÖRÜNÜMÜ
+========================================================= */
 
-  const g=$("type").value==="Gider";
-  const c=
-    g &&
-    $("payment").value==="Kredi Kartı";
+function sync() {
 
-  $("payment").disabled=!g;
-  $("card").disabled=!c;
+  if (!$("type")) {
+    return;
+  }
 
-  $("installmentBox").hidden=!c;
+
+  const isExpense =
+    $("type").value === "Gider";
+
+
+  const isCreditCard =
+    isExpense &&
+    $("payment").value ===
+    "Kredi Kartı";
+
+
+  $("payment").disabled =
+    !isExpense;
+
+
+  $("card").disabled =
+    !isCreditCard;
+
+
+  $("installmentBox").hidden =
+    !isCreditCard;
+
+
+  if (!isCreditCard) {
+
+    $("installment").checked =
+      false;
+
+    $("installmentFields").hidden =
+      true;
+
+    $("installmentPreview")
+      .textContent = "";
+  }
+
 
   populateCategories();
 }
 
-async function firebaseInit(){
 
-  try{
+/* =========================================================
+   FIREBASE BAŞLAT
+========================================================= */
+
+async function initializeFirebase() {
+
+  try {
+
+    /* ---------------------------------------------
+       FIREBASE CORE
+    --------------------------------------------- */
 
     const {
       initializeApp
     } = await import(
-      "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js"
+      `https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-app.js`
     );
 
+
+    firebaseApp =
+      initializeApp(
+        firebaseConfig
+      );
+
+
+    /* ---------------------------------------------
+       AUTH
+    --------------------------------------------- */
+
     const {
-      getAuth,
+      initializeAuth,
+      browserLocalPersistence,
       GoogleAuthProvider,
       signInWithPopup,
       signOut,
       onAuthStateChanged
     } = await import(
-      "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js"
+      `https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-auth.js`
     );
 
-    const firestore =
-      await import(
-        "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js"
+
+    /*
+      ÖNEMLİ:
+
+      IndexedDB yerine browserLocalPersistence
+      kullanıyoruz.
+
+      Böylece Google popup açıldığında
+      "Database is closing/hidden" sorununa
+      takılmıyoruz.
+    */
+
+    auth =
+      initializeAuth(
+        firebaseApp,
+        {
+          persistence:
+            browserLocalPersistence
+        }
       );
 
-    const app=initializeApp(firebaseConfig);
 
-    auth=getAuth(app);
-    db=firestore.getFirestore(app);
+    firebaseReady = true;
 
-    const {
-      doc,
-      getDoc,
-      setDoc
-    }=firestore;
 
-    firebaseReady=true;
+    /* ---------------------------------------------
+       GİRİŞ BUTONU
+    --------------------------------------------- */
 
-    createLoginUI(
+    createLoginButton(
       GoogleAuthProvider,
       signInWithPopup,
       signOut
     );
 
-    onAuthStateChanged(auth,async user=>{
 
-      currentUser=user;
+    /* ---------------------------------------------
+       KULLANICI DURUMU
+    --------------------------------------------- */
 
-      updateLoginUI();
+    onAuthStateChanged(
+      auth,
+      async user => {
 
-      if(user){
+        currentUser = user;
 
-        await loadCloudData(
-          user,
-          doc,
-          getDoc,
-          setDoc
-        );
+        updateLoginButton();
 
-      }else{
 
-        render();
+        if (user) {
+
+          createStatus(
+            "Google hesabına giriş yapıldı."
+          );
+
+
+          await loadCloudData();
+
+        } else {
+
+          createStatus(
+            "Yerel mod aktif."
+          );
+
+          render();
+        }
 
       }
-
-    });
-
-  }catch(error){
-
-    console.error("Firebase başlatılamadı:",error);
-
-    createStatus(
-      "Firebase bağlantısı kurulamadı. Yerel kayıt modu aktif."
-    );
-  }
-}
-
-async function loadCloudData(
-  user,
-  doc,
-  getDoc,
-  setDoc
-){
-
-  try{
-
-    const ref=doc(
-      db,
-      "users",
-      user.uid,
-      "data",
-      "main"
     );
 
-    const snap=await getDoc(ref);
 
-    if(snap.exists()){
-
-      const data=snap.data();
-
-      if(Array.isArray(data.items))
-        items=data.items;
-
-      if(data.settings)
-        settings={
-          ...settings,
-          ...data.settings
-        };
-
-      localSave();
-
-    }else{
-
-      await setDoc(ref,{
-        items,
-        settings,
-        updatedAt:new Date().toISOString()
-      });
-
-    }
-
-    render();
-
-  }catch(error){
+  } catch (error) {
 
     console.error(
-      "Cloud veri okunamadı:",
+      "Firebase başlatma hatası:",
       error
     );
 
-    alert(
-      "Firebase bağlantısı var fakat veriler okunamadı. Firestore kurallarını kontrol et."
+
+    createStatus(
+      "Firebase başlatılamadı. Yerel kayıt kullanılacak."
     );
+
+
+    render();
   }
 }
 
-async function saveCloud(){
 
-  localSave();
+/* =========================================================
+   FIRESTORE MODÜLÜ
+========================================================= */
 
-  render();
+async function getFirestoreModule() {
 
-  if(!firebaseReady || !currentUser || !db)
+  return await import(
+    `https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-firestore.js`
+  );
+}
+
+
+/* =========================================================
+   FIRESTORE'DAN VERİ OKU
+========================================================= */
+
+async function loadCloudData() {
+
+  if (!currentUser) {
+    render();
     return;
+  }
 
-  try{
+
+  try {
 
     const {
+      getFirestore,
       doc,
-      setDoc
-    }=await import(
-      "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js"
-    );
+      getDoc
+    } = await getFirestoreModule();
 
-    await setDoc(
+
+    if (!db) {
+
+      db =
+        getFirestore(
+          firebaseApp
+        );
+    }
+
+
+    const ref =
       doc(
         db,
         "users",
         currentUser.uid,
         "data",
         "main"
-      ),
-      {
-        items,
-        settings,
-        updatedAt:new Date().toISOString()
-      },
-      {merge:true}
-    );
+      );
 
-    createStatus("Buluta kaydedildi.");
 
-  }catch(error){
+    const snapshot =
+      await getDoc(ref);
+
+
+    if (snapshot.exists()) {
+
+      const data =
+        snapshot.data();
+
+
+      if (
+        Array.isArray(
+          data.items
+        )
+      ) {
+
+        items =
+          data.items;
+      }
+
+
+      if (
+        data.settings &&
+        typeof data.settings ===
+        "object"
+      ) {
+
+        settings = {
+          ...settings,
+          ...data.settings
+        };
+      }
+
+
+      saveLocal();
+
+
+      createStatus(
+        "Bulut verileri yüklendi."
+      );
+
+    } else {
+
+      await saveCloud();
+
+    }
+
+
+    render();
+
+
+  } catch (error) {
 
     console.error(
-      "Firebase kayıt hatası:",
+      "Firestore okuma hatası:",
       error
     );
 
+
     alert(
-      "Buluta kayıt yapılamadı: "+error.message
+      "Firebase bağlantısı var fakat Firestore verisi okunamadı.\n\n" +
+      error.message
+    );
+
+
+    render();
+  }
+}
+
+
+/* =========================================================
+   FIRESTORE'A VERİ KAYDET
+========================================================= */
+
+async function saveCloud() {
+
+  /* Önce bilgisayara kaydet */
+  saveLocal();
+
+  render();
+
+
+  /* Google girişi yoksa sadece yerel kayıt */
+  if (
+    !firebaseReady ||
+    !currentUser
+  ) {
+
+    return;
+  }
+
+
+  try {
+
+    const {
+      getFirestore,
+      doc,
+      setDoc
+    } = await getFirestoreModule();
+
+
+    if (!db) {
+
+      db =
+        getFirestore(
+          firebaseApp
+        );
+    }
+
+
+    const ref =
+      doc(
+        db,
+        "users",
+        currentUser.uid,
+        "data",
+        "main"
+      );
+
+
+    await setDoc(
+      ref,
+      {
+        items: items,
+        settings: settings,
+        updatedAt:
+          new Date().toISOString()
+      },
+      {
+        merge: true
+      }
+    );
+
+
+    createStatus(
+      "✓ Buluta kaydedildi."
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Firestore kayıt hatası:",
+      error
+    );
+
+
+    alert(
+      "Buluta kayıt yapılamadı.\n\n" +
+      error.message
     );
   }
 }
 
-function createLoginUI(
+
+/* =========================================================
+   GOOGLE GİRİŞ BUTONU
+========================================================= */
+
+function createLoginButton(
   GoogleAuthProvider,
   signInWithPopup,
   signOut
-){
+) {
 
-  const header=document.querySelector("header");
+  const header =
+    document.querySelector(
+      "header"
+    );
 
-  if(!header) return;
 
-  const actions=
-    header.querySelector(".header-actions");
-
-  if(!actions) return;
-
-  if(document.getElementById("firebaseLogin"))
+  if (!header) {
     return;
+  }
 
-  const btn=document.createElement("button");
 
-  btn.id="firebaseLogin";
-  btn.className="ghost";
-  btn.textContent="Google ile Giriş";
+  const actions =
+    header.querySelector(
+      ".header-actions"
+    );
 
-  btn.onclick=async()=>{
 
-    try{
+  if (!actions) {
+    return;
+  }
 
-      if(currentUser){
 
-        await signOut(auth);
+  if (
+    document.getElementById(
+      "firebaseLogin"
+    )
+  ) {
 
-      }else{
+    return;
+  }
 
-        const provider=
+
+  const button =
+    document.createElement(
+      "button"
+    );
+
+
+  button.id =
+    "firebaseLogin";
+
+
+  button.className =
+    "ghost";
+
+
+  button.textContent =
+    "Google ile Giriş";
+
+
+  button.onclick =
+    async () => {
+
+      try {
+
+        /* ---------------------------------
+           ÇIKIŞ
+        --------------------------------- */
+
+        if (currentUser) {
+
+          await signOut(auth);
+
+          createStatus(
+            "Çıkış yapıldı."
+          );
+
+          return;
+        }
+
+
+        /* ---------------------------------
+           GOOGLE GİRİŞ
+        --------------------------------- */
+
+        const provider =
           new GoogleAuthProvider();
+
+
+        provider.setCustomParameters({
+          prompt: "select_account"
+        });
+
 
         await signInWithPopup(
           auth,
           provider
         );
 
-      }
 
-    }catch(error){
+      } catch (error) {
 
-      console.error(error);
-
-      alert(
-        "Giriş işlemi başarısız: "+
-        error.message
-      );
-    }
-  };
-
-  actions.appendChild(btn);
-}
-
-function updateLoginUI(){
-
-  const btn=$("firebaseLogin");
-
-  if(!btn) return;
-
-  if(currentUser){
-
-    btn.textContent=
-      "Çıkış · "+
-      (currentUser.displayName ||
-       currentUser.email ||
-       "Google");
-
-  }else{
-
-    btn.textContent="Google ile Giriş";
-  }
-}
-
-function createStatus(text){
-
-  let el=$("firebaseStatus");
-
-  if(!el){
-
-    el=document.createElement("div");
-
-    el.id="firebaseStatus";
-
-    el.style.cssText=`
-      position:fixed;
-      bottom:15px;
-      right:15px;
-      z-index:9999;
-      background:#1f4e78;
-      color:white;
-      padding:10px 14px;
-      border-radius:8px;
-      font-size:13px;
-      box-shadow:0 3px 12px rgba(0,0,0,.2);
-    `;
-
-    document.body.appendChild(el);
-  }
-
-  el.textContent=text;
-
-  setTimeout(()=>{
-    el.remove();
-  },2500);
-}
-
-if($("type"))
-  $("type").onchange=sync;
-
-if($("payment"))
-  $("payment").onchange=sync;
-
-if($("installment"))
-  $("installment").onchange=()=>{
-    $("installmentFields").hidden=
-      !$("installment").checked;
-  };
-
-if($("amount"))
-  $("amount").oninput=()=>{
-
-    const box=$("installmentPreview");
-
-    if(!$("installment").checked){
-
-      box.textContent="";
-      return;
-    }
-
-    const a=Number($("amount").value);
-
-    const n=
-      Number($("installmentCount").value)||1;
-
-    box.textContent=
-      a>0
-        ?`Aylık taksit: ${money(a/n)}`
-        :"";
-  };
-
-if($("installmentCount"))
-  $("installmentCount").onchange=
-    $("amount")?.oninput;
-
-if($("form")){
-
-  $("form").onsubmit=async e=>{
-
-    e.preventDefault();
-
-    const type=$("type").value;
-
-    const amount=
-      Number($("amount").value);
-
-    const payment=
-      type==="Gider"
-        ?$("payment").value
-        :"";
-
-    const card=
-      payment==="Kredi Kartı"
-        ?$("card").value
-        :"";
-
-    const description=
-      $("description").value.trim();
-
-    if(!description)
-      return alert("Açıklama gir.");
-
-    if(!amount || amount<=0)
-      return alert("Geçerli tutar gir.");
-
-    if(
-      (type==="Gelir" ||
-       type==="Gider") &&
-      !$("category").value
-    )
-      return alert("Kategori seç.");
-
-    if(
-      payment==="Kredi Kartı" &&
-      !card
-    )
-      return alert("Kart seç.");
-
-    const count=
-      payment==="Kredi Kartı" &&
-      $("installment").checked
-        ?Number(
-            $("installmentCount").value
-          )||1
-        :1;
-
-    items.push({
-
-      id:Date.now(),
-
-      date:$("date").value,
-
-      description,
-
-      type,
-
-      payment,
-
-      card,
-
-      category:
-        type==="Kasa Transferi"
-          ?"Kasa Transferi"
-          :$("category").value,
-
-      amount,
-
-      installments:count
-    });
-
-    $("description").value="";
-    $("amount").value="";
-
-    $("installment").checked=false;
-
-    $("installmentFields").hidden=true;
-
-    $("installmentPreview").textContent="";
-
-    await saveCloud();
-  };
-}
-
-if($("clearBtn")){
-
-  $("clearBtn").onclick=async()=>{
-
-    const ids=
-      [...document.querySelectorAll(".sel:checked")]
-      .map(x=>+x.dataset.id);
-
-    if(!ids.length)
-      return alert("Silmek için işlem seç.");
-
-    if(
-      confirm(
-        "Seçili işlemler silinsin mi?"
-      )
-    ){
-
-      items=
-        items.filter(
-          x=>!ids.includes(x.id)
+        console.error(
+          "Google giriş hatası:",
+          error
         );
 
-      await saveCloud();
-    }
-  };
+
+        alert(
+          "Giriş işlemi başarısız:\n\n" +
+          error.message
+        );
+      }
+    };
+
+
+  actions.appendChild(
+    button
+  );
 }
 
-if($("clearAllBtn")){
 
-  $("clearAllBtn").onclick=async()=>{
+/* =========================================================
+   GİRİŞ BUTONU DURUMU
+========================================================= */
 
-    if(
-      confirm(
-        "Tüm kayıtlar silinecek. Bu işlem geri alınamaz. Devam edilsin mi?"
-      )
-    ){
+function updateLoginButton() {
 
-      items=[];
+  const button =
+    $("firebaseLogin");
 
-      await saveCloud();
-    }
-  };
+
+  if (!button) {
+    return;
+  }
+
+
+  if (currentUser) {
+
+    const name =
+      currentUser.displayName ||
+      currentUser.email ||
+      "Google";
+
+
+    button.textContent =
+      "Çıkış · " + name;
+
+  } else {
+
+    button.textContent =
+      "Google ile Giriş";
+  }
 }
 
-if($("exportBtn")){
 
-  $("exportBtn").onclick=()=>{
+/* =========================================================
+   DURUM MESAJI
+========================================================= */
 
-    const a=document.createElement("a");
+function createStatus(text) {
 
-    const u=
-      URL.createObjectURL(
+  let box =
+    $("firebaseStatus");
+
+
+  if (!box) {
+
+    box =
+      document.createElement(
+        "div"
+      );
+
+
+    box.id =
+      "firebaseStatus";
+
+
+    box.style.cssText = `
+      position:fixed;
+      right:15px;
+      bottom:15px;
+      z-index:99999;
+      background:#1f4e78;
+      color:white;
+      padding:10px 15px;
+      border-radius:8px;
+      font-size:13px;
+      box-shadow:0 3px 12px rgba(0,0,0,.25);
+    `;
+
+
+    document.body.appendChild(
+      box
+    );
+  }
+
+
+  box.textContent =
+    text;
+
+
+  clearTimeout(
+    box._timer
+  );
+
+
+  box._timer =
+    setTimeout(
+      () => {
+
+        if (box.parentNode) {
+          box.remove();
+        }
+
+      },
+      3000
+    );
+}
+
+
+/* =========================================================
+   FORM OLAYLARI
+========================================================= */
+
+if ($("type")) {
+
+  $("type").onchange =
+    sync;
+}
+
+
+if ($("payment")) {
+
+  $("payment").onchange =
+    sync;
+}
+
+
+if ($("installment")) {
+
+  $("installment").onchange =
+    () => {
+
+      $("installmentFields")
+        .hidden =
+        !$("installment").checked;
+
+
+      if (
+        $("amount") &&
+        $("amount").value
+      ) {
+
+        $("amount").oninput();
+      }
+    };
+}
+
+
+if ($("amount")) {
+
+  $("amount").oninput =
+    () => {
+
+      const preview =
+        $("installmentPreview");
+
+
+      if (
+        !$("installment").checked
+      ) {
+
+        preview.textContent =
+          "";
+
+        return;
+      }
+
+
+      const amount =
+        Number(
+          $("amount").value
+        );
+
+
+      const count =
+        Number(
+          $("installmentCount").value
+        ) || 1;
+
+
+      preview.textContent =
+        amount > 0
+          ? `Aylık taksit: ${money(
+              amount / count
+            )}`
+          : "";
+    };
+}
+
+
+if ($("installmentCount")) {
+
+  $("installmentCount").onchange =
+    () => {
+
+      if ($("amount")) {
+        $("amount").oninput();
+      }
+    };
+}
+
+
+/* =========================================================
+   YENİ İŞLEM
+========================================================= */
+
+if ($("form")) {
+
+  $("form").onsubmit =
+    async event => {
+
+      event.preventDefault();
+
+
+      const type =
+        $("type").value;
+
+
+      const amount =
+        Number(
+          $("amount").value
+        );
+
+
+      const payment =
+        type === "Gider"
+          ? $("payment").value
+          : "";
+
+
+      const card =
+        payment === "Kredi Kartı"
+          ? $("card").value
+          : "";
+
+
+      const description =
+        $("description")
+          .value
+          .trim();
+
+
+      /* ---------------------------------
+         KONTROLLER
+      --------------------------------- */
+
+      if (!description) {
+
+        alert(
+          "Açıklama gir."
+        );
+
+        return;
+      }
+
+
+      if (
+        !amount ||
+        amount <= 0
+      ) {
+
+        alert(
+          "Geçerli tutar gir."
+        );
+
+        return;
+      }
+
+
+      if (
+        (
+          type === "Gelir" ||
+          type === "Gider"
+        ) &&
+        !$("category").value
+      ) {
+
+        alert(
+          "Kategori seç."
+        );
+
+        return;
+      }
+
+
+      if (
+        payment ===
+        "Kredi Kartı" &&
+        !card
+      ) {
+
+        alert(
+          "Kart seç."
+        );
+
+        return;
+      }
+
+
+      /* ---------------------------------
+         TAKSİT
+      --------------------------------- */
+
+      const count =
+        payment ===
+        "Kredi Kartı" &&
+        $("installment").checked
+          ? Number(
+              $("installmentCount")
+                .value
+            ) || 1
+          : 1;
+
+
+      /* ---------------------------------
+         KAYIT
+      --------------------------------- */
+
+      items.push({
+
+        id: Date.now(),
+
+        date:
+          $("date").value,
+
+        description:
+
+          description,
+
+        type:
+          type,
+
+        payment:
+          payment,
+
+        card:
+          card,
+
+        category:
+          type ===
+          "Kasa Transferi"
+            ? "Kasa Transferi"
+            : $("category").value,
+
+        amount:
+          amount,
+
+        installments:
+          count
+      });
+
+
+      /* ---------------------------------
+         FORMU TEMİZLE
+      --------------------------------- */
+
+      $("description")
+        .value = "";
+
+
+      $("amount")
+        .value = "";
+
+
+      $("installment")
+        .checked = false;
+
+
+      $("installmentFields")
+        .hidden = true;
+
+
+      $("installmentPreview")
+        .textContent = "";
+
+
+      /* ---------------------------------
+         FIREBASE + LOCAL
+      --------------------------------- */
+
+      await saveCloud();
+    };
+}
+
+
+/* =========================================================
+   SEÇİLİ İŞLEMLERİ SİL
+========================================================= */
+
+if ($("clearBtn")) {
+
+  $("clearBtn").onclick =
+    async () => {
+
+      const ids =
+        [
+          ...document
+            .querySelectorAll(
+              ".sel:checked"
+            )
+        ]
+        .map(
+          checkbox =>
+            Number(
+              checkbox.dataset.id
+            )
+        );
+
+
+      if (!ids.length) {
+
+        alert(
+          "Silmek için işlem seç."
+        );
+
+        return;
+      }
+
+
+      if (
+        !confirm(
+          "Seçili işlemler silinsin mi?"
+        )
+      ) {
+
+        return;
+      }
+
+
+      items =
+        items.filter(
+          item =>
+            !ids.includes(
+              Number(item.id)
+            )
+        );
+
+
+      await saveCloud();
+    };
+}
+
+
+/* =========================================================
+   TÜM KAYITLARI SİL
+========================================================= */
+
+if ($("clearAllBtn")) {
+
+  $("clearAllBtn").onclick =
+    async () => {
+
+      if (
+        !confirm(
+          "Tüm kayıtlar silinecek.\n\n" +
+          "Bu işlem geri alınamaz.\n\n" +
+          "Devam edilsin mi?"
+        )
+      ) {
+
+        return;
+      }
+
+
+      items = [];
+
+
+      await saveCloud();
+    };
+}
+
+
+/* =========================================================
+   YEDEKLE
+========================================================= */
+
+if ($("exportBtn")) {
+
+  $("exportBtn").onclick =
+    () => {
+
+      const link =
+        document.createElement(
+          "a"
+        );
+
+
+      const blob =
         new Blob(
           [
             JSON.stringify(
@@ -805,46 +1708,81 @@ if($("exportBtn")){
             )
           ],
           {
-            type:"application/json"
+            type:
+              "application/json"
           }
-        )
+        );
+
+
+      const url =
+        URL.createObjectURL(
+          blob
+        );
+
+
+      link.href =
+        url;
+
+
+      link.download =
+        "gelir-gider-yedek.json";
+
+
+      link.click();
+
+
+      URL.revokeObjectURL(
+        url
       );
-
-    a.href=u;
-
-    a.download=
-      "gelir-gider-yedek.json";
-
-    a.click();
-
-    URL.revokeObjectURL(u);
-  };
+    };
 }
 
-localLoad();
 
-if($("date")){
+/* =========================================================
+   BAŞLANGIÇ
+========================================================= */
 
-  $("date").value=
-    currentMonth()+
+loadLocal();
+
+
+/* Tarih */
+
+if ($("date")) {
+
+  $("date").value =
+    currentMonth() +
     "-" +
     String(
       new Date().getDate()
-    ).padStart(2,"0");
+    ).padStart(2, "0");
 }
 
-if($("card")){
 
-  $("card").innerHTML=
-    '<option value="">Kart seç</option>'+
-    settings.cards.map(
-      (c,i)=>
-        `<option value="c${i}">
-          ${esc(c.name)}
-        </option>`
-    ).join("");
+/* Kartlar */
+
+if ($("card")) {
+
+  $("card").innerHTML =
+    '<option value="">Kart seç</option>' +
+
+    settings.cards
+      .map(
+        (card, index) =>
+          `<option value="c${index}">
+            ${esc(card.name)}
+          </option>`
+      )
+      .join("");
 }
+
+
+/* İlk görünüm */
 
 sync();
+
 render();
-firebaseInit();
+
+
+/* Firebase */
+
+initializeFirebase();
