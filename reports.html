@@ -243,6 +243,35 @@ td{
     color:#c13737;
 }
 
+.action-cell{
+    white-space:nowrap;
+    text-align:right;
+}
+
+.action-btn{
+    border:1px solid #cbd5df;
+    background:white;
+    color:#1f4e78;
+    padding:7px 10px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:13px;
+    margin-left:5px;
+}
+
+.action-btn:hover{
+    background:#eef6ff;
+}
+
+.action-btn.delete{
+    color:#b42318;
+    border-color:#efb8b5;
+}
+
+.action-btn.delete:hover{
+    background:#fff0f0;
+}
+
 .empty{
     text-align:center;
     padding:30px;
@@ -426,6 +455,7 @@ td{
                             <th>Kategori</th>
                             <th>Tür</th>
                             <th class="amount">Tutar</th>
+                            <th class="action-cell">İşlem</th>
                         </tr>
                     </thead>
 
@@ -462,7 +492,8 @@ import {
 import {
     getFirestore,
     doc,
-    getDoc
+    getDoc,
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
@@ -507,6 +538,8 @@ const db = getFirestore(app);
    ========================================================= */
 
 let allItems = [];
+let currentUser = null;
+let userRef = null;
 
 
 /* =========================================================
@@ -557,6 +590,20 @@ const distributionSubtitle =
 
 const debugInfo =
     document.getElementById("debugInfo");
+
+
+/* =========================================================
+   HTML GÜVENLİK
+   ========================================================= */
+
+function escapeHtml(value){
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 
 
 /* =========================================================
@@ -972,7 +1019,7 @@ function renderReport(){
 
         transactionTable.innerHTML = `
             <tr>
-                <td colspan="5" class="empty">
+                <td colspan="6" class="empty">
                     Kayıt bulunamadı.
                 </td>
             </tr>
@@ -990,42 +1037,25 @@ function renderReport(){
                 return `
                     <tr>
 
-                        <td>
-                            ${formatDate(item.date)}
-                        </td>
+                        <td>${escapeHtml(formatDate(item.date))}</td>
+
+                        <td>${escapeHtml(item.description || "-")}</td>
+
+                        <td>${escapeHtml(item.category || "-")}</td>
 
                         <td>
-                            ${item.description || "-"}
-                        </td>
-
-                        <td>
-                            ${item.category || "-"}
-                        </td>
-
-                        <td>
-
-                            <span class="
-                                type-badge
-                                ${
-                                    isIncome
-                                        ? "type-income"
-                                        : "type-expense"
-                                }
-                            ">
-                                ${item.type || "-"}
+                            <span class="type-badge ${isIncome ? "type-income" : "type-expense"}">
+                                ${escapeHtml(item.type || "-")}
                             </span>
-
                         </td>
 
-                        <td class="
-                            amount
-                            ${
-                                isIncome
-                                    ? "income"
-                                    : "expense"
-                            }
-                        ">
+                        <td class="amount ${isIncome ? "income" : "expense"}">
                             ${money(item.amount)}
+                        </td>
+
+                        <td class="action-cell">
+                            <button type="button" class="action-btn edit-btn" data-id="${escapeHtml(item.id)}">Düzenle</button>
+                            <button type="button" class="action-btn delete delete-btn" data-id="${escapeHtml(item.id)}">Sil</button>
                         </td>
 
                     </tr>
@@ -1084,6 +1114,80 @@ function renderReport(){
 
 
 /* =========================================================
+   RAPORLARDA DÜZENLE / SİL
+   ========================================================= */
+
+function findItemById(id){
+    return allItems.find(item => String(item.id) === String(id));
+}
+
+async function saveItemsToFirebase(items){
+    if(!userRef) throw new Error("Firebase kullanıcı referansı hazır değil.");
+    await updateDoc(userRef, { items });
+}
+
+async function editItem(id){
+    const item = findItemById(id);
+    if(!item){ alert("Kayıt bulunamadı."); return; }
+
+    const date = prompt("Tarih (YYYY-AA-GG):", item.date || "");
+    if(date === null) return;
+    const description = prompt("Açıklama:", item.description || "");
+    if(description === null) return;
+    const category = prompt("Kategori:", item.category || "");
+    if(category === null) return;
+    const type = prompt("Tür: Gelir veya Gider", item.type || "Gider");
+    if(type === null) return;
+    const normalizedType = type.trim();
+    if(normalizedType !== "Gelir" && normalizedType !== "Gider"){
+        alert("Tür sadece 'Gelir' veya 'Gider' olabilir."); return;
+    }
+    const amountText = prompt("Tutar:", String(item.amount ?? ""));
+    if(amountText === null) return;
+    const amount = Number(amountText.trim().replace(/\./g, "").replace(",", "."));
+    if(!Number.isFinite(amount) || amount < 0){ alert("Geçerli bir tutar girin."); return; }
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date.trim())){
+        alert("Tarih YYYY-AA-GG biçiminde olmalı. Örnek: 2026-08-25"); return;
+    }
+
+    const updatedItems = allItems.map(existing => String(existing.id) === String(id) ? { ...existing, date:date.trim(), description:description.trim(), category:category.trim(), type:normalizedType, amount } : existing);
+    try{
+        await saveItemsToFirebase(updatedItems);
+        allItems = updatedItems;
+        fillCategories(); fillPeriods(); renderReport();
+        alert("Kayıt başarıyla güncellendi.");
+    }catch(error){
+        console.error("Düzenleme hatası:", error);
+        alert("Kayıt güncellenemedi:\n" + (error.message || error));
+    }
+}
+
+async function deleteItem(id){
+    const item = findItemById(id);
+    if(!item){ alert("Kayıt bulunamadı."); return; }
+    const confirmed = confirm(`"${item.description || item.category || "Kayıt"}" kaydını silmek istediğinize emin misiniz?\n\nTutar: ${money(item.amount)}\nTarih: ${formatDate(item.date)}`);
+    if(!confirmed) return;
+    const updatedItems = allItems.filter(existing => String(existing.id) !== String(id));
+    try{
+        await saveItemsToFirebase(updatedItems);
+        allItems = updatedItems;
+        fillCategories(); fillPeriods(); renderReport();
+        alert("Kayıt başarıyla silindi.");
+    }catch(error){
+        console.error("Silme hatası:", error);
+        alert("Kayıt silinemedi:\n" + (error.message || error));
+    }
+}
+
+transactionTable.addEventListener("click", event => {
+    const editButton = event.target.closest(".edit-btn");
+    const deleteButton = event.target.closest(".delete-btn");
+    if(editButton){ editItem(editButton.dataset.id); return; }
+    if(deleteButton){ deleteItem(deleteButton.dataset.id); }
+});
+
+
+/* =========================================================
    FİLTRELER
    ========================================================= */
 
@@ -1135,6 +1239,9 @@ onAuthStateChanged(
 
         if(!user){
 
+            currentUser = null;
+            userRef = null;
+
             authBar.innerHTML = `
                 Giriş yapılmamış.
             `;
@@ -1147,6 +1254,10 @@ onAuthStateChanged(
             return;
         }
 
+
+        currentUser = user;
+
+        userRef = doc(db, "users", user.uid);
 
         authBar.innerHTML = `
             ☁️ ${user.displayName || user.email}
@@ -1175,14 +1286,6 @@ onAuthStateChanged(
              *   └── UID
              *        └── items
              */
-
-            const userRef =
-                doc(
-                    db,
-                    "users",
-                    user.uid
-                );
-
 
             const snapshot =
                 await getDoc(userRef);
