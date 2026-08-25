@@ -1,213 +1,2159 @@
 <!doctype html>
 <html lang="tr">
+
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1f4e78">
-<link rel="stylesheet" href="style.css">
-<title>Raporlar V1.8</title>
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1,viewport-fit=cover"
+>
+
+<meta
+  name="theme-color"
+  content="#1f4e78"
+>
+
+<link
+  rel="stylesheet"
+  href="style.css"
+>
+
+<title>Raporlar - Gelir Gider</title>
+
 </head>
+
 <body>
+
 <header>
-  <div><h1>Raporlar <small style="font-size:11px;opacity:.7">V1.8</small></h1><div class="sub">Geçmiş ayları ve kategorileri incele</div></div>
-  <a class="ghost link-btn" href="index.html">← Ana Sayfa</a>
+
+  <div>
+
+    <h1>
+      Raporlar
+      <small style="font-size:11px;opacity:.7">
+        V2.0
+      </small>
+    </h1>
+
+    <div class="sub">
+      Geçmiş ayları ve kategorileri incele
+    </div>
+
+  </div>
+
+  <div class="header-actions">
+
+    <a
+      class="ghost link-btn"
+      href="index.html"
+    >
+      ← Ana Sayfa
+    </a>
+
+  </div>
+
 </header>
+
+
+<!-- =========================================================
+     FIREBASE DURUMU
+========================================================= -->
+
+<div
+  id="firebaseBar"
+  style="
+    width:100%;
+    box-sizing:border-box;
+    padding:10px 16px;
+    background:#eef6ff;
+    border-bottom:1px solid #cbdcec;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    font-family:Arial,sans-serif;
+  "
+>
+
+  <span id="firebaseStatus">
+    Firebase bağlantısı kontrol ediliyor...
+  </span>
+
+  <button
+    id="loginBtn"
+    type="button"
+    style="
+      background:#1f4e78;
+      color:white;
+      border:0;
+      border-radius:8px;
+      padding:9px 15px;
+      font-weight:600;
+      cursor:pointer;
+    "
+  >
+    Google ile giriş yap
+  </button>
+
+  <button
+    id="logoutBtn"
+    type="button"
+    style="
+      display:none;
+      background:white;
+      color:#1f4e78;
+      border:1px solid #1f4e78;
+      border-radius:8px;
+      padding:9px 15px;
+      font-weight:600;
+      cursor:pointer;
+    "
+  >
+    Çıkış Yap
+  </button>
+
+</div>
+
+
 <main>
+
+
+<!-- =========================================================
+     FİLTRE
+========================================================= -->
+
 <section class="panel">
- <div class="panel-head"><h2>Filtre</h2></div>
- <div class="report-filter">
-  <label>Tür<select id="rtype"><option value="Gelir">Gelir</option><option value="Gider">Gider</option></select></label>
-  <label>Kategori<select id="rcat"><option value="all">Tüm Kategoriler</option></select></label>
-  <label>Dönem<select id="period"><option value="3">Son 3 Ay</option><option value="7" selected>Son 7 Ay</option><option value="12">Son 12 Ay</option><option value="all">Tüm Dönem</option></select></label>
- </div>
- <div id="filterInfo" class="filter-info"></div>
+
+  <div class="panel-head">
+
+    <h2>Filtre</h2>
+
+  </div>
+
+
+  <div class="report-filter">
+
+    <label>
+
+      Tür
+
+      <select id="rtype">
+
+        <option value="Gelir">
+          Gelir
+        </option>
+
+        <option value="Gider">
+          Gider
+        </option>
+
+      </select>
+
+    </label>
+
+
+    <label>
+
+      Kategori
+
+      <select id="rcat">
+
+        <option value="all">
+          Tüm Kategoriler
+        </option>
+
+      </select>
+
+    </label>
+
+
+    <label>
+
+      Dönem
+
+      <select id="period">
+
+        <option value="3">
+          Son 3 Ay
+        </option>
+
+        <option
+          value="7"
+          selected
+        >
+          Son 7 Ay
+        </option>
+
+        <option value="12">
+          Son 12 Ay
+        </option>
+
+        <option value="all">
+          Tüm Dönem
+        </option>
+
+      </select>
+
+    </label>
+
+  </div>
+
+
+  <div
+    id="filterInfo"
+    class="filter-info"
+  ></div>
+
 </section>
+
+
+<!-- =========================================================
+     ÖZET
+========================================================= -->
 
 <section class="summary">
- <div class="card income"><span>Seçilen Toplam</span><strong id="selectedTotal">0 ₺</strong></div>
- <div class="card expense"><span>Aylık Ortalama</span><strong id="average">0 ₺</strong></div>
- <div class="card net"><span>En Yüksek Ay</span><strong id="maxMonth">-</strong></div>
- <div class="card transfer"><span>İşlem Sayısı</span><strong id="count">0</strong></div>
+
+  <div class="card income">
+
+    <span>
+      Seçilen Toplam
+    </span>
+
+    <strong id="selectedTotal">
+      0 ₺
+    </strong>
+
+  </div>
+
+
+  <div class="card expense">
+
+    <span>
+      Aylık Ortalama
+    </span>
+
+    <strong id="average">
+      0 ₺
+    </strong>
+
+  </div>
+
+
+  <div class="card net">
+
+    <span>
+      En Yüksek Ay
+    </span>
+
+    <strong id="maxMonth">
+      -
+    </strong>
+
+  </div>
+
+
+  <div class="card transfer">
+
+    <span>
+      İşlem Sayısı
+    </span>
+
+    <strong id="count">
+      0
+    </strong>
+
+  </div>
+
 </section>
+
+
+<!-- =========================================================
+     AYLIK DAĞILIM
+========================================================= -->
 
 <section class="panel">
- <div class="panel-head"><div><h2>Aylık Dağılım</h2><span id="reportTitle" class="muted"></span></div></div>
- <div class="table-wrap"><table>
-  <thead><tr><th>Ay</th><th>Tutar</th><th>İşlem Sayısı</th></tr></thead>
-  <tbody id="reportList"></tbody>
- </table></div>
+
+  <div class="panel-head">
+
+    <div>
+
+      <h2>
+        Aylık Dağılım
+      </h2>
+
+      <span
+        id="reportTitle"
+        class="muted"
+      ></span>
+
+    </div>
+
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Ay
+          </th>
+
+          <th>
+            Tutar
+          </th>
+
+          <th>
+            İşlem Sayısı
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody
+        id="reportList"
+      ></tbody>
+
+    </table>
+
+  </div>
+
 </section>
+
+
+<!-- =========================================================
+     İŞLEMLER
+========================================================= -->
 
 <section class="panel">
- <div class="panel-head"><h2>İşlemler</h2></div>
- <div class="table-wrap"><table>
-  <thead><tr><th>Tarih</th><th>Açıklama</th><th>Kategori</th><th>Tutar</th><th>İşlem</th></tr></thead>
-  <tbody id="detailList"></tbody>
- </table></div>
+
+  <div class="panel-head">
+
+    <h2>
+      İşlemler
+    </h2>
+
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Tarih
+          </th>
+
+          <th>
+            Açıklama
+          </th>
+
+          <th>
+            Kategori
+          </th>
+
+          <th>
+            Tutar
+          </th>
+
+          <th>
+            İşlem
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody
+        id="detailList"
+      ></tbody>
+
+    </table>
+
+  </div>
+
 </section>
+
+
+<!-- =========================================================
+     KATEGORİSİZ
+========================================================= -->
 
 <section class="panel">
- <div class="panel-head"><div><h2>Kategorisiz Eski Kayıtlar</h2><span class="muted">Eski kayıtları doğrudan Düzenle ile kategorilendir.</span></div></div>
- <div class="table-wrap"><table>
-  <thead><tr><th>Tarih</th><th>Açıklama</th><th>Tür</th><th>Tutar</th><th>Kategori</th><th>İşlem</th></tr></thead>
-  <tbody id="uncatList"></tbody>
- </table></div>
+
+  <div class="panel-head">
+
+    <div>
+
+      <h2>
+        Kategorisiz Eski Kayıtlar
+      </h2>
+
+      <span class="muted">
+        Eski kayıtları Düzenle ile kategorilendir.
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Tarih
+          </th>
+
+          <th>
+            Açıklama
+          </th>
+
+          <th>
+            Tür
+          </th>
+
+          <th>
+            Tutar
+          </th>
+
+          <th>
+            Kategori
+          </th>
+
+          <th>
+            İşlem
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody
+        id="uncatList"
+      ></tbody>
+
+    </table>
+
+  </div>
+
 </section>
 
-<p class="note">Eski kayıtların silinmez. Raporlardaki <b>Düzenle</b> butonuyla kategori, açıklama, tarih veya tutarı değiştirebilirsin.</p>
+
+<p class="note">
+
+  Eski kayıtlar silinmez.
+  Düzenle butonuyla kategori,
+  açıklama, tarih veya tutarı değiştirebilirsin.
+
+</p>
+
+
 </main>
 
+
+<!-- =========================================================
+     FIREBASE + RAPOR KODU
+========================================================= -->
+
 <script type="module">
-import { firebaseReady, getItems, getSettings, saveItems } from "./firebase-core.js";
 
-let items=[], settings={
- incomeCategories:["Maaş","Ek Ders","Diğer Gelir"],
- expenseCategories:["Kira","Market","Fatura","Yakıt","Nakit","Diğer Gider"]
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+
+
+import {
+
+  getAuth,
+
+  GoogleAuthProvider,
+
+  signInWithPopup,
+
+  signOut,
+
+  onAuthStateChanged
+
+}
+from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+
+
+import {
+
+  getFirestore,
+
+  doc,
+
+  getDoc,
+
+  setDoc
+
+}
+from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+
+// =========================================================
+// FIREBASE AYARLARI
+// =========================================================
+
+const firebaseConfig = {
+
+  apiKey:
+    "AIzaSyC8Pk7DCPwmb5RK2NQCBPEv692-lzeeo4c",
+
+  authDomain:
+    "gelir-gider-546b4.firebaseapp.com",
+
+  projectId:
+    "gelir-gider-546b4",
+
+  storageBucket:
+    "gelir-gider-546b4.firebasestorage.app",
+
+  messagingSenderId:
+    "682384311790",
+
+  appId:
+    "1:682384311790:web:2ba8621cec98145232faff"
+
 };
-const $=id=>document.getElementById(id);
-const money=n=>new Intl.NumberFormat("tr-TR",{style:"currency",currency:"TRY",maximumFractionDigits:2}).format(n);
-const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-function isCard(x){return x.type==="Gider"&&x.payment==="Kredi Kartı"&&x.card?.startsWith("c")}
-function inst(x){return Math.max(1,Number(x.installments)||1)}
-function ym(d){return String(d).slice(0,7)}
-function addMonths(z,n){
- let [y,m]=z.split("-").map(Number); m+=n; y+=Math.floor((m-1)/12); m=(m-1)%12+1;
- return y+"-"+String(m).padStart(2,"0");
-}
-function due(x,m){
- if(!isCard(x))return 0;
- const s=ym(x.date),d=(+m.slice(0,4)-+s.slice(0,4))*12+(+m.slice(5)-+s.slice(5));
- return d>=0&&d<inst(x)?x.amount/inst(x):0;
-}
-function monthLabel(m){return new Date(m+"-01T00:00:00").toLocaleDateString("tr-TR",{month:"long",year:"numeric"})}
 
-function populateCategories(){
- const type=$("rtype").value;
- const arr=type==="Gelir"?settings.incomeCategories:settings.expenseCategories;
- $("rcat").innerHTML='<option value="all">Tüm Kategoriler</option><option value="uncategorized">Kategorisiz Eski Kayıtlar</option>'+
-   arr.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
-}
 
-function valueForMonth(x,m){
- if(x.type==="Gider"&&isCard(x))return due(x,m);
- if(x.type==="Gelir"||x.type==="Gider")return String(x.date).startsWith(m)?Number(x.amount)||0:0;
- return 0;
-}
+// =========================================================
+// FIREBASE BAŞLAT
+// =========================================================
 
-function render(){
- const type=$("rtype").value,cat=$("rcat").value,period=$("period").value,now=new Date().toISOString().slice(0,7);
- const eligible=x=>x.type===type && (cat==="all" ? true : cat==="uncategorized" ? !x.category : x.category===cat);
+const app =
+  initializeApp(firebaseConfig);
 
- let months=[];
- if(period==="all"){
-   items.filter(x=>x.type===type).forEach(x=>{const m=ym(x.date);if(!months.includes(m))months.push(m)});
-   items.filter(x=>type==="Gider"&&isCard(x)).forEach(x=>{for(let i=0;i<inst(x);i++){const m=addMonths(ym(x.date),i);if(!months.includes(m))months.push(m)}});
-   months.sort().reverse();
- }else{
-   for(let i=0;i<Number(period);i++)months.push(addMonths(now,-i));
- }
 
- let total=0,count=0,monthRows=[],details=[];
- for(const m of months){
-   let val=0,cnt=0;
-   items.filter(eligible).forEach(x=>{
-     const v=valueForMonth(x,m);
-     if(v>0){
-       val+=v;cnt++;
-       if(String(x.date).startsWith(m)||isCard(x))details.push({x,v});
-     }
-   });
-   if(val>0||period==="all")monthRows.push({m,val,cnt});
-   total+=val;count+=cnt;
- }
+const auth =
+  getAuth(app);
 
- $("selectedTotal").textContent=money(total);
- $("average").textContent=money(monthRows.length?total/monthRows.length:0);
- const max=monthRows.reduce((a,b)=>b.val>a.val?b:a,{m:"-",val:0});
- $("maxMonth").textContent=max.val?monthLabel(max.m):"-";
- $("count").textContent=count;
- $("reportTitle").textContent=`${type}${cat==="uncategorized"?" · Kategorisiz":cat!=="all"?" · "+cat:""} · ${period==="all"?"Tüm Dönem":"Son "+period+" Ay"}`;
- $("reportList").innerHTML=monthRows.map(r=>`<tr><td>${monthLabel(r.m)}</td><td class="amount">${money(r.val)}</td><td>${r.cnt}</td></tr>`).join("")||'<tr><td colspan="3" class="empty">Kayıt bulunamadı.</td></tr>';
 
- const seen=new Set();
- details.sort((a,b)=>b.x.date.localeCompare(a.x.date));
- const rows=[];
- details.forEach(d=>{const k=String(d.x.id)+"-"+String(d.v);if(!seen.has(k)){seen.add(k);rows.push(d)}});
- $("detailList").innerHTML=rows.map(d=>`
- <tr>
-  <td>${new Date(d.x.date+"T00:00:00").toLocaleDateString("tr-TR")}</td>
-  <td>${esc(d.x.description)}</td>
-  <td>${esc(d.x.category||"Kategorisiz")}</td>
-  <td class="amount">${money(d.v)}</td>
-  <td><button type="button" class="editBtn" data-id="${d.x.id}">Düzenle</button></td>
- </tr>`).join("")||'<tr><td colspan="5" class="empty">Kayıt bulunamadı.</td></tr>';
+const db =
+  getFirestore(app);
 
- const missing=items.filter(x=>(x.type==="Gelir"||x.type==="Gider")&&x.type===type&&!x.category);
- $("filterInfo").textContent=missing.length
-   ? `${missing.length} eski ${type.toLowerCase()} kaydında kategori eksik. Düzenle butonundan kategori verebilirsin.`
-   : "Kayıtları Düzenle butonundan değiştirebilirsin.";
 
- renderUncategorized();
-}
+const provider =
+  new GoogleAuthProvider();
 
-function renderUncategorized(){
- const type=$("rtype").value;
- const rows=items.filter(x=>(x.type==="Gelir"||x.type==="Gider")&&x.type===type&&!x.category);
- $("uncatList").innerHTML=rows.length?rows.sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`
- <tr>
-  <td>${new Date(x.date+"T00:00:00").toLocaleDateString("tr-TR")}</td>
-  <td>${esc(x.description)}</td>
-  <td>${esc(x.type)}</td>
-  <td class="amount">${money(x.amount)}</td>
-  <td>Kategorisiz</td>
-  <td><button type="button" class="editBtn" data-id="${x.id}">Düzenle</button></td>
- </tr>`).join(""):'<tr><td colspan="6" class="empty">Bu türde kategorisiz eski kayıt yok.</td></tr>';
-}
 
-function openEdit(id){
- const x=items.find(v=>Number(v.id)===Number(id));
- if(!x){alert("Kayıt bulunamadı.");return;}
- const arr=x.type==="Gelir"?settings.incomeCategories:settings.expenseCategories;
- const modal=document.createElement("div");
- modal.className="edit-modal";
- modal.innerHTML=`<div class="edit-box">
-  <h2>İşlemi Düzenle</h2>
-  <label>Tarih<input id="edDate" type="date" value="${esc(x.date)}"></label>
-  <label>Açıklama<input id="edDesc" type="text" value="${esc(x.description)}"></label>
-  <label>Tutar<input id="edAmount" type="number" step="0.01" min="0.01" value="${Number(x.amount)}"></label>
-  <label>Kategori<select id="edCat"><option value="">Kategorisiz</option>${arr.map(c=>`<option value="${esc(c)}" ${x.category===c?"selected":""}>${esc(c)}</option>`).join("")}</select></label>
-  <div class="edit-actions"><button type="button" id="edCancel" class="ghost">Vazgeç</button><button type="button" id="edSave" class="primary">Kaydet</button></div>
- </div>`;
- document.body.appendChild(modal);
- modal.querySelector("#edCancel").onclick=()=>modal.remove();
- modal.addEventListener("click",e=>{if(e.target===modal)modal.remove()});
- modal.querySelector("#edSave").onclick=()=>{
-   const date=modal.querySelector("#edDate").value;
-   const desc=modal.querySelector("#edDesc").value.trim();
-   const amount=Number(modal.querySelector("#edAmount").value);
-   const category=modal.querySelector("#edCat").value;
-   if(!date||!desc||!amount||amount<=0){alert("Tarih, açıklama ve geçerli tutar gerekli.");return;}
-   x.date=date;x.description=desc;x.amount=amount;x.category=category;
-   save().then(()=>{modal.remove();render()}).catch(err=>alert("Kaydedilemedi: "+err.message));
- };
+let currentUser = null;
+
+let items = [];
+
+let settings = {
+
+  cards: [
+
+    {
+      name: "Kart 1",
+      limit: 0
+    },
+
+    {
+      name: "Kart 2",
+      limit: 0
+    },
+
+    {
+      name: "Kart 3",
+      limit: 0
+    }
+
+  ],
+
+  incomeCategories: [
+
+    "Maaş",
+    "Ek Ders",
+    "Diğer Gelir"
+
+  ],
+
+  expenseCategories: [
+
+    "Kira",
+    "Market",
+    "Fatura",
+    "Yakıt",
+    "Nakit",
+    "Diğer Gider"
+
+  ]
+
+};
+
+
+// =========================================================
+// YARDIMCI
+// =========================================================
+
+const $ =
+  id =>
+    document.getElementById(id);
+
+
+const money =
+  n =>
+
+    new Intl.NumberFormat(
+      "tr-TR",
+      {
+        style: "currency",
+        currency: "TRY",
+        maximumFractionDigits: 2
+      }
+    ).format(
+      Number(n) || 0
+    );
+
+
+const esc =
+  s =>
+
+    String(s ?? "")
+      .replace(
+        /[&<>"']/g,
+
+        m => ({
+
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+
+        }[m])
+
+      );
+
+
+function ym(d) {
+
+  return String(d ?? "")
+    .slice(0,7);
+
 }
 
-// Event delegation: buttons are recreated by render(), so binding once is reliable.
-document.addEventListener("click",e=>{
- const btn=e.target.closest(".editBtn");
- if(btn){e.preventDefault();openEdit(btn.dataset.id);}
-});
 
-async function save(){ await saveItems(items); }
-async function main(){
- const data=await firebaseReady();
- items=data.items; settings=data.settings;
- populateCategories();
- $("rtype").onchange=()=>{populateCategories();render()};
- $("rcat").onchange=render;
- $("period").onchange=render;
- render();
+function addMonths(z,n) {
+
+  let [
+    y,
+    m
+  ] =
+    z
+      .split("-")
+      .map(Number);
+
+  m += n;
+
+  y +=
+    Math.floor(
+      (m - 1) / 12
+    );
+
+  m =
+    (m - 1) % 12 + 1;
+
+  return (
+
+    y +
+    "-" +
+    String(m)
+      .padStart(2,"0")
+
+  );
+
 }
-main().catch(e=>{console.error(e);alert("Firebase bağlantısı kurulamadı: "+e.message)});
+
+
+function monthLabel(m) {
+
+  return new Date(
+    m +
+    "-01T00:00:00"
+  )
+    .toLocaleDateString(
+      "tr-TR",
+      {
+        month:"long",
+        year:"numeric"
+      }
+    );
+
+}
+
+
+// =========================================================
+// KREDİ KARTI
+// =========================================================
+
+function isCard(x) {
+
+  return (
+
+    x.type === "Gider" &&
+
+    x.payment ===
+      "Kredi Kartı" &&
+
+    typeof x.card ===
+      "string" &&
+
+    x.card.startsWith("c")
+
+  );
+
+}
+
+
+function inst(x) {
+
+  return Math.max(
+    1,
+    Number(
+      x.installments
+    ) || 1
+  );
+
+}
+
+
+function due(x,m) {
+
+  if (!isCard(x)) {
+
+    return 0;
+
+  }
+
+
+  const s =
+    ym(x.date);
+
+
+  const d =
+
+    (
+      +m.slice(0,4) -
+      +s.slice(0,4)
+    ) * 12 +
+
+    (
+      +m.slice(5) -
+      +s.slice(5)
+    );
+
+
+  return (
+
+    d >= 0 &&
+    d < inst(x)
+
+  )
+
+    ? Number(x.amount) /
+      inst(x)
+
+    : 0;
+
+}
+
+
+// =========================================================
+// FIRESTORE KULLANICI DOKÜMANI
+// =========================================================
+
+function userRef() {
+
+  if (!currentUser) {
+
+    return null;
+
+  }
+
+
+  return doc(
+
+    db,
+
+    "users",
+
+    currentUser.uid
+
+  );
+
+}
+
+
+// =========================================================
+// FIRESTORE OKU
+// =========================================================
+
+async function loadCloud() {
+
+  const ref =
+    userRef();
+
+  if (!ref) {
+
+    throw new Error(
+      "Firebase kullanıcısı bulunamadı."
+    );
+
+  }
+
+
+  const snap =
+    await getDoc(ref);
+
+
+  if (!snap.exists()) {
+
+    items = [];
+
+    return;
+
+  }
+
+
+  const data =
+    snap.data();
+
+
+  if (
+    Array.isArray(
+      data.items
+    )
+  ) {
+
+    items =
+      data.items;
+
+  }
+
+
+  if (
+    data.settings &&
+    typeof data.settings ===
+      "object"
+  ) {
+
+    settings =
+      data.settings;
+
+  }
+
+}
+
+
+// =========================================================
+// FIRESTORE KAYDET
+// =========================================================
+
+async function saveCloud() {
+
+  const ref =
+    userRef();
+
+  if (!ref) {
+
+    throw new Error(
+      "Firebase kullanıcısı bulunamadı."
+    );
+
+  }
+
+
+  await setDoc(
+
+    ref,
+
+    {
+
+      items,
+
+      settings,
+
+      updatedAt:
+        new Date()
+          .toISOString()
+
+    },
+
+    {
+      merge:true
+    }
+
+  );
+
+}
+
+
+// =========================================================
+// KATEGORİLER
+// =========================================================
+
+function populateCategories() {
+
+  const type =
+    $("rtype").value;
+
+
+  const arr =
+    type === "Gelir"
+
+      ? settings.incomeCategories
+
+      : settings.expenseCategories;
+
+
+  $("rcat").innerHTML =
+
+    `<option value="all">
+      Tüm Kategoriler
+    </option>
+
+    <option value="uncategorized">
+      Kategorisiz Eski Kayıtlar
+    </option>`
+
+    +
+
+    arr
+      .map(
+
+        c =>
+
+          `<option value="${esc(c)}">
+            ${esc(c)}
+          </option>`
+
+      )
+      .join("");
+
+}
+
+
+// =========================================================
+// AYLIK DEĞER
+// =========================================================
+
+function valueForMonth(x,m) {
+
+  if (
+    x.type === "Gider" &&
+    isCard(x)
+  ) {
+
+    return due(x,m);
+
+  }
+
+
+  if (
+    x.type === "Gelir" ||
+    x.type === "Gider"
+  ) {
+
+    return
+
+      String(x.date)
+        .startsWith(m)
+
+        ? Number(x.amount) || 0
+
+        : 0;
+
+  }
+
+
+  return 0;
+
+}
+
+
+// =========================================================
+// RAPOR
+// =========================================================
+
+function render() {
+
+  const type =
+    $("rtype").value;
+
+
+  const cat =
+    $("rcat").value;
+
+
+  const period =
+    $("period").value;
+
+
+  const now =
+    new Date()
+      .toISOString()
+      .slice(0,7);
+
+
+  const eligible =
+    x =>
+
+      x.type === type &&
+
+      (
+
+        cat === "all"
+
+        ? true
+
+        :
+
+        cat ===
+          "uncategorized"
+
+        ? !x.category
+
+        :
+
+        x.category === cat
+
+      );
+
+
+  let months = [];
+
+
+  if (
+    period === "all"
+  ) {
+
+    items
+
+      .filter(
+        x =>
+          x.type === type
+      )
+
+      .forEach(
+
+        x => {
+
+          const m =
+            ym(x.date);
+
+          if (
+            m &&
+            !months.includes(m)
+          ) {
+
+            months.push(m);
+
+          }
+
+        }
+
+      );
+
+
+    items
+
+      .filter(
+        x =>
+          type === "Gider" &&
+          isCard(x)
+      )
+
+      .forEach(
+
+        x => {
+
+          for (
+            let i = 0;
+            i < inst(x);
+            i++
+          ) {
+
+            const m =
+              addMonths(
+                ym(x.date),
+                i
+              );
+
+
+            if (
+              !months.includes(m)
+            ) {
+
+              months.push(m);
+
+            }
+
+          }
+
+        }
+
+      );
+
+
+    months.sort().reverse();
+
+  }
+
+  else {
+
+    for (
+      let i = 0;
+      i < Number(period);
+      i++
+    ) {
+
+      months.push(
+        addMonths(
+          now,
+          -i
+        )
+      );
+
+    }
+
+  }
+
+
+  let total = 0;
+
+  let count = 0;
+
+  let monthRows = [];
+
+  let details = [];
+
+
+  for (
+    const m of months
+  ) {
+
+    let val = 0;
+
+    let cnt = 0;
+
+
+    items
+
+      .filter(eligible)
+
+      .forEach(
+
+        x => {
+
+          const v =
+            valueForMonth(
+              x,
+              m
+            );
+
+
+          if (v > 0) {
+
+            val += v;
+
+            cnt++;
+
+
+            if (
+
+              String(x.date)
+                .startsWith(m)
+
+              ||
+
+              isCard(x)
+
+            ) {
+
+              details.push({
+                x,
+                v
+              });
+
+            }
+
+          }
+
+        }
+
+      );
+
+
+    if (
+      val > 0 ||
+      period === "all"
+    ) {
+
+      monthRows.push({
+        m,
+        val,
+        cnt
+      });
+
+    }
+
+
+    total += val;
+
+    count += cnt;
+
+  }
+
+
+  $("selectedTotal")
+    .textContent =
+      money(total);
+
+
+  $("average")
+    .textContent =
+
+      money(
+        monthRows.length
+          ? total /
+            monthRows.length
+          : 0
+      );
+
+
+  const max =
+    monthRows.reduce(
+
+      (a,b) =>
+        b.val > a.val
+          ? b
+          : a,
+
+      {
+        m:"-",
+        val:0
+      }
+
+    );
+
+
+  $("maxMonth")
+    .textContent =
+
+      max.val
+        ? monthLabel(max.m)
+        : "-";
+
+
+  $("count")
+    .textContent =
+      count;
+
+
+  $("reportTitle")
+    .textContent =
+
+      `${type}` +
+
+      (
+
+        cat ===
+          "uncategorized"
+
+          ? " · Kategorisiz"
+
+          :
+
+        cat !== "all"
+
+          ? " · " + cat
+
+          : ""
+
+      ) +
+
+      " · " +
+
+      (
+
+        period === "all"
+
+          ? "Tüm Dönem"
+
+          : "Son " +
+            period +
+            " Ay"
+
+      );
+
+
+  $("reportList")
+    .innerHTML =
+
+      monthRows
+
+        .map(
+
+          r =>
+
+            `<tr>
+
+              <td>
+                ${monthLabel(r.m)}
+              </td>
+
+              <td class="amount">
+                ${money(r.val)}
+              </td>
+
+              <td>
+                ${r.cnt}
+              </td>
+
+            </tr>`
+
+        )
+
+        .join("")
+
+      ||
+
+      `<tr>
+
+        <td
+          colspan="3"
+          class="empty"
+        >
+          Kayıt bulunamadı.
+        </td>
+
+      </tr>`;
+
+
+  // =======================================================
+  // DETAY
+  // =======================================================
+
+  details.sort(
+
+    (a,b) =>
+
+      String(b.x.date)
+        .localeCompare(
+          String(a.x.date)
+        )
+
+  );
+
+
+  const seen =
+    new Set();
+
+
+  const rows = [];
+
+
+  details.forEach(
+
+    d => {
+
+      const key =
+        String(d.x.id) +
+        "-" +
+        String(d.v);
+
+
+      if (
+        !seen.has(key)
+      ) {
+
+        seen.add(key);
+
+        rows.push(d);
+
+      }
+
+    }
+
+  );
+
+
+  $("detailList")
+    .innerHTML =
+
+      rows
+
+        .map(
+
+          d => `
+
+            <tr>
+
+              <td>
+
+                ${
+
+                  new Date(
+                    d.x.date +
+                    "T00:00:00"
+                  )
+                    .toLocaleDateString(
+                      "tr-TR"
+                    )
+
+                }
+
+              </td>
+
+
+              <td>
+                ${esc(
+                  d.x.description
+                )}
+              </td>
+
+
+              <td>
+                ${esc(
+                  d.x.category ||
+                  "Kategorisiz"
+                )}
+              </td>
+
+
+              <td class="amount">
+                ${money(d.v)}
+              </td>
+
+
+              <td>
+
+                <button
+                  type="button"
+                  class="editBtn"
+                  data-id="${d.x.id}"
+                >
+                  Düzenle
+                </button>
+
+              </td>
+
+            </tr>
+
+          `
+
+        )
+
+        .join("")
+
+      ||
+
+      `<tr>
+
+        <td
+          colspan="5"
+          class="empty"
+        >
+          Kayıt bulunamadı.
+        </td>
+
+      </tr>`;
+
+
+  renderUncategorized();
+
+}
+
+
+// =========================================================
+// KATEGORİSİZ
+// =========================================================
+
+function renderUncategorized() {
+
+  const type =
+    $("rtype").value;
+
+
+  const rows =
+
+    items.filter(
+
+      x =>
+
+        (
+          x.type === "Gelir" ||
+          x.type === "Gider"
+        )
+
+        &&
+
+        x.type === type
+
+        &&
+
+        !x.category
+
+    );
+
+
+  $("uncatList")
+    .innerHTML =
+
+      rows.length
+
+        ?
+
+          rows
+
+            .sort(
+
+              (a,b) =>
+
+                String(b.date)
+                  .localeCompare(
+                    String(a.date)
+                  )
+
+            )
+
+            .map(
+
+              x => `
+
+                <tr>
+
+                  <td>
+
+                    ${
+
+                      new Date(
+                        x.date +
+                        "T00:00:00"
+                      )
+                        .toLocaleDateString(
+                          "tr-TR"
+                        )
+
+                    }
+
+                  </td>
+
+
+                  <td>
+                    ${esc(
+                      x.description
+                    )}
+                  </td>
+
+
+                  <td>
+                    ${esc(x.type)}
+                  </td>
+
+
+                  <td class="amount">
+                    ${money(x.amount)}
+                  </td>
+
+
+                  <td>
+                    Kategorisiz
+                  </td>
+
+
+                  <td>
+
+                    <button
+                      type="button"
+                      class="editBtn"
+                      data-id="${x.id}"
+                    >
+                      Düzenle
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              `
+
+            )
+
+            .join("")
+
+        :
+
+          `<tr>
+
+            <td
+              colspan="6"
+              class="empty"
+            >
+              Bu türde kategorisiz eski kayıt yok.
+            </td>
+
+          </tr>`;
+
+}
+
+
+// =========================================================
+// DÜZENLE
+// =========================================================
+
+function openEdit(id) {
+
+  const x =
+    items.find(
+      v =>
+        Number(v.id) ===
+        Number(id)
+    );
+
+
+  if (!x) {
+
+    alert(
+      "Kayıt bulunamadı."
+    );
+
+    return;
+
+  }
+
+
+  const arr =
+
+    x.type === "Gelir"
+
+      ? settings.incomeCategories
+
+      : settings.expenseCategories;
+
+
+  const modal =
+    document.createElement(
+      "div"
+    );
+
+
+  modal.className =
+    "edit-modal";
+
+
+  modal.innerHTML = `
+
+    <div class="edit-box">
+
+      <h2>
+        İşlemi Düzenle
+      </h2>
+
+
+      <label>
+
+        Tarih
+
+        <input
+          id="edDate"
+          type="date"
+          value="${esc(x.date)}"
+        >
+
+      </label>
+
+
+      <label>
+
+        Açıklama
+
+        <input
+          id="edDesc"
+          type="text"
+          value="${esc(x.description)}"
+        >
+
+      </label>
+
+
+      <label>
+
+        Tutar
+
+        <input
+          id="edAmount"
+          type="number"
+          step="0.01"
+          min="0.01"
+          value="${Number(x.amount)}"
+        >
+
+      </label>
+
+
+      <label>
+
+        Kategori
+
+        <select id="edCat">
+
+          <option value="">
+            Kategorisiz
+          </option>
+
+          ${
+
+            arr
+
+              .map(
+
+                c => `
+
+                  <option
+                    value="${esc(c)}"
+                    ${
+                      x.category === c
+                        ? "selected"
+                        : ""
+                    }
+                  >
+                    ${esc(c)}
+                  </option>
+
+                `
+
+              )
+
+              .join("")
+
+          }
+
+        </select>
+
+      </label>
+
+
+      <div class="edit-actions">
+
+        <button
+          type="button"
+          id="edCancel"
+          class="ghost"
+        >
+          Vazgeç
+        </button>
+
+
+        <button
+          type="button"
+          id="edSave"
+          class="primary"
+        >
+          Kaydet
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  document.body.appendChild(
+    modal
+  );
+
+
+  modal
+    .querySelector(
+      "#edCancel"
+    )
+    .onclick =
+      () =>
+        modal.remove();
+
+
+  modal.addEventListener(
+
+    "click",
+
+    e => {
+
+      if (
+        e.target === modal
+      ) {
+
+        modal.remove();
+
+      }
+
+    }
+
+  );
+
+
+  modal
+    .querySelector(
+      "#edSave"
+    )
+    .onclick =
+
+      async () => {
+
+        const date =
+          modal
+            .querySelector(
+              "#edDate"
+            )
+            .value;
+
+
+        const desc =
+          modal
+            .querySelector(
+              "#edDesc"
+            )
+            .value
+            .trim();
+
+
+        const amount =
+          Number(
+            modal
+              .querySelector(
+                "#edAmount"
+              )
+              .value
+          );
+
+
+        const category =
+          modal
+            .querySelector(
+              "#edCat"
+            )
+            .value;
+
+
+        if (
+          !date ||
+          !desc ||
+          !amount ||
+          amount <= 0
+        ) {
+
+          alert(
+            "Tarih, açıklama ve geçerli tutar gerekli."
+          );
+
+          return;
+
+        }
+
+
+        x.date =
+          date;
+
+        x.description =
+          desc;
+
+        x.amount =
+          amount;
+
+        x.category =
+          category;
+
+
+        try {
+
+          await saveCloud();
+
+          modal.remove();
+
+          render();
+
+        }
+
+        catch(error) {
+
+          console.error(
+            error
+          );
+
+          alert(
+            "Kaydedilemedi:\n\n" +
+            error.code +
+            "\n\n" +
+            error.message
+          );
+
+        }
+
+      };
+
+}
+
+
+// =========================================================
+// DÜZENLE BUTONLARI
+// =========================================================
+
+document.addEventListener(
+
+  "click",
+
+  e => {
+
+    const btn =
+      e.target.closest(
+        ".editBtn"
+      );
+
+
+    if (!btn) {
+      return;
+    }
+
+
+    e.preventDefault();
+
+
+    openEdit(
+      btn.dataset.id
+    );
+
+  }
+
+);
+
+
+// =========================================================
+// GOOGLE GİRİŞ
+// =========================================================
+
+$("loginBtn").onclick =
+
+  async () => {
+
+    try {
+
+      $("loginBtn").disabled =
+        true;
+
+
+      $("firebaseStatus")
+        .textContent =
+          "Google hesabı açılıyor...";
+
+
+      await signInWithPopup(
+        auth,
+        provider
+      );
+
+    }
+
+    catch(error) {
+
+      console.error(
+        "Firebase giriş hatası:",
+        error
+      );
+
+
+      $("firebaseStatus")
+        .textContent =
+          "Giriş başarısız.";
+
+
+      alert(
+
+        "Giriş başarısız:\n\n" +
+
+        error.code +
+
+        "\n\n" +
+
+        error.message
+
+      );
+
+    }
+
+    finally {
+
+      $("loginBtn").disabled =
+        false;
+
+    }
+
+  };
+
+
+// =========================================================
+// ÇIKIŞ
+// =========================================================
+
+$("logoutBtn").onclick =
+
+  async () => {
+
+    try {
+
+      await signOut(auth);
+
+    }
+
+    catch(error) {
+
+      alert(
+        "Çıkış yapılamadı:\n\n" +
+        error.message
+      );
+
+    }
+
+  };
+
+
+// =========================================================
+// AUTH DURUMU
+// =========================================================
+
+onAuthStateChanged(
+
+  auth,
+
+  async user => {
+
+    currentUser =
+      user || null;
+
+
+    if (!user) {
+
+      $("firebaseStatus")
+        .textContent =
+          "Firebase'e giriş yapılmamış.";
+
+
+      $("loginBtn")
+        .style.display =
+          "inline-block";
+
+
+      $("logoutBtn")
+        .style.display =
+          "none";
+
+
+      return;
+
+    }
+
+
+    $("firebaseStatus")
+      .textContent =
+
+        `☁️ ${
+          user.displayName ||
+          user.email ||
+          "Kullanıcı"
+        } — Firebase'e bağlı`;
+
+
+    $("loginBtn")
+      .style.display =
+        "none";
+
+
+    $("logoutBtn")
+      .style.display =
+        "inline-block";
+
+
+    try {
+
+      await loadCloud();
+
+
+      populateCategories();
+
+
+      $("rtype").onchange =
+
+        () => {
+
+          populateCategories();
+
+          render();
+
+        };
+
+
+      $("rcat").onchange =
+        render;
+
+
+      $("period").onchange =
+        render;
+
+
+      render();
+
+    }
+
+    catch(error) {
+
+      console.error(
+        "Firebase veri okuma hatası:",
+        error
+      );
+
+
+      alert(
+
+        "Firebase verileri okunamadı:\n\n" +
+
+        error.code +
+
+        "\n\n" +
+
+        error.message
+
+      );
+
+    }
+
+  }
+
+);
+
 </script>
-</body></html>
+
+</body>
+</html>
