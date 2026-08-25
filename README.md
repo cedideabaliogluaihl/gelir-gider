@@ -1,7 +1,7 @@
-# Gelir-Gider V1.5
+# Gelir-Gider V1.6
 
-- Eski kategorisiz kayıtlar korunur.
-- Raporlar'da "Kategorisiz Eski Kayıtlar" filtresi ile eski kayıtlar tek tek kategorilendirilebilir.
-- Maaş / Ek Ders / Kira gibi kategori raporları kategori atandıktan sonra çalışır.
-- Yeni Gelir/Gider kayıtlarında kategori zorunludur.
-- Ana ekran yalnızca güncel ayı gösterir.
+Raporlar sayfasında “Kategorisiz Eski Kayıtlar” seçeneği HTML içinde doğrudan bulunur.
+V1.6 sürümü sayfa başlığında görünür.
+Eski kategorisiz kayıtlar korunur ve tek tek kategori atanabilir.
+Yeni gelir/gider kayıtlarında kategori zorunludur.
+Ana ekran yalnızca güncel ayı gösterir.

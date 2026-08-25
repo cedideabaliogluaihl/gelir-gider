@@ -1,11 +1,14 @@
 <!doctype html><html lang="tr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1f4e78"><link rel="stylesheet" href="style.css"><title>Raporlar - Gelir Gider</title></head>
-<body><header><div><h1>Raporlar</h1><div class="sub">Geçmiş ayları ve kategorileri incele</div></div><a class="ghost link-btn" href="index.html">← Ana Sayfa</a></header><main>
+<body><header><div><h1>Raporlar <small style="font-size:11px;opacity:.7">V1.6</small></h1><div class="sub">Geçmiş ayları ve kategorileri incele</div></div><a class="ghost link-btn" href="index.html">← Ana Sayfa</a></header><main>
 <section class="panel"><div class="panel-head"><h2>Filtre</h2></div>
 <div class="report-filter">
 <label>Tür<select id="rtype"><option value="Gelir">Gelir</option><option value="Gider">Gider</option></select></label>
-<label>Kategori<select id="rcat"></select></label>
+<label>Kategori<select id="rcat">
+<option value="all">Tüm Kategoriler</option>
+<option value="uncategorized">Kategorisiz Eski Kayıtlar</option>
+</select></label>
 <label>Dönem<select id="period"><option value="3">Son 3 Ay</option><option value="7" selected>Son 7 Ay</option><option value="12">Son 12 Ay</option><option value="all">Tüm Dönem</option></select></label>
 </div></section>
 <section class="summary">

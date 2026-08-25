@@ -2,3 +2,5 @@
 .header-actions{display:flex;gap:8px;align-items:center}.small-link{font-size:12px;color:#1f4e78;text-decoration:none}.report-filter{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.report-filter label{font-size:12px;color:#68737d;display:grid;gap:5px}.report-filter select{width:100%}
 .category-list{display:grid;gap:7px;margin-bottom:10px}.category-item{display:flex;justify-content:space-between;align-items:center;background:#f7f8fa;border-radius:9px;padding:8px 10px}.category-item .danger-outline{height:30px}.add-category{display:flex;gap:8px}.add-category input{flex:1}
 @media(max-width:700px){.report-filter{grid-template-columns:1fr}.header-actions{flex-wrap:wrap}.header-actions .link-btn{padding:7px}}
+
+.legacy-count{padding:12px;background:#fff8df;border-radius:10px;border:1px solid #ead38b}.legacy-count strong{font-size:20px;margin-right:5px}.filter-info{margin-top:10px;padding:8px 10px;background:#f7f8fa;border-radius:8px;font-size:12px}
